@@ -16,7 +16,7 @@ export const connectToDB = async () => {
     }
 
     // Connect to MongoDB using URL from environment variable
-    const db = await mongoose.connect(process.env.MONGO_URI);
+    const db = await mongoose.connect(process.env.MONGO_URL);
 
     // Set connection status
     connection.isConnected = db.connections[0].readyState; // readyState values: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
