@@ -1,9 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
-import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { connectToDB } from "./utils/connectDB.js";
+import dsaQuestionRoutes from "./routes/DSAQuestionRouter.js";
 
 
 dotenv.config();
@@ -18,12 +18,15 @@ const PORT = process.env.PORT || 5000;
 
 
 app.use(cors(corsOptions)); // Enable CORS with defined options
-app.use(bodyParser.json()); // Parse incoming JSON requests
 app.use(cookieParser());// Parse cookies from incoming requests
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.send("PrepMate Backend is Running!");
-});
+
+// Routes
+app.use("/api/dsa-questions", dsaQuestionRoutes);
+
+
 // Global error handling middleware
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500; // Default to 500 if no status
