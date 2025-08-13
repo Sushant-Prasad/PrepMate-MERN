@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { connectToDB } from "./utils/connectDB.js";
 import dsaQuestionRoutes from "./routes/DSAQuestionRouter.js";
+import dailyDSArouter from "./routes/DailyDSAQuestionRouter.js";
 
 
 dotenv.config();
@@ -25,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/dsa-questions", dsaQuestionRoutes);
-
+app.use("/api/daily-dsa", dailyDSArouter);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
