@@ -12,12 +12,26 @@
   "author": "Sushant Prasad",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
+    "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
     "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "mongoose": "^8.17.0"
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "method-override": "^3.0.0",
+    "mongoose": "^8.17.1",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.5",
+    "otp-generator": "^4.0.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "validate": "^5.2.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
