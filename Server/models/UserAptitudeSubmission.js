@@ -4,7 +4,7 @@ const userAptitudeSubmissionSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "AuthUser", // Reference to authentication model
+      ref: "User", // Reference to authentication model
       required: true,
     },
     questionId: {

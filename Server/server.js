@@ -6,6 +6,8 @@ import { connectToDB } from "./utils/connectDB.js";
 import dsaQuestionRoutes from "./routes/DSAQuestionRouter.js";
 import dailyDSArouter from "./routes/DailyDSAQuestionRouter.js";
 import aptitudeQuestionRoutes from "./routes/AptitudeQuestionRouter.js";
+import dailyAptitudeRoutes from "./routes/DailyAptitudeQuestionRouter.js";
+import userAptitudeSubmissionRouter from "./routes/UserAptitudeSubmissionRouter.js";
 
 
 
@@ -30,6 +32,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/dsa-questions", dsaQuestionRoutes);
 app.use("/api/daily-dsa", dailyDSArouter);
 app.use("/api/aptitude-questions", aptitudeQuestionRoutes);
+app.use("/api/daily-aptitude", dailyAptitudeRoutes);
+app.use("/api/aptitude-submission", userAptitudeSubmissionRouter);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
