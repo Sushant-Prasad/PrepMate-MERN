@@ -7,7 +7,7 @@ const JUDGE0_URL = "https://judge0-ce.p.rapidapi.com";
 const JUDGE0_HEADERS = {
   "Content-Type": "application/json",
   "X-RapidAPI-Host": process.env.JUDGE0_API_HOST,
-  "X-RapidAPI-Key": process.env.JUDGE0_API_KEY, // put in .env
+  "X-RapidAPI-Key": process.env.JUDGE0_API_KEY,
 };
 
 // Submit DSA solution
@@ -45,7 +45,7 @@ export const submitDSASolution = async (req, res) => {
         `${JUDGE0_URL}/submissions?base64_encoded=false&wait=false`,
         {
           source_code: code,
-          language_id:languageId, // or map frontend language -> Judge0 ID
+          language_id:languageId, 
           stdin: tc.input,
           expected_output: tc.output,
         },

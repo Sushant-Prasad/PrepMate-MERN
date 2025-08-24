@@ -1,4 +1,3 @@
-// controllers/DailyDSAQuestionController.js
 import DailyDSAQuestion from "../models/DailyDSAQuestion.js";
 import DSAQuestion from "../models/DSAQuestion.js";
 import cron from "node-cron";

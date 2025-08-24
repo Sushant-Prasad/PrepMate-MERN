@@ -1,4 +1,3 @@
-// controllers/DailyAptitudeQuestionController.js
 import DailyAptitudeQuestion from "../models/DailyAptitudeQuestion.js";
 import AptitudeQuestion from "../models/AptitudeQuestion.js";
 import cron from "node-cron";
@@ -80,11 +79,11 @@ cron.schedule("0 0 * * *", async () => {
   try {
     const result = await assignDailyAptitudeService();
     if (result.success) {
-      console.log("✅ Daily Aptitude assigned:", result.dailyQuestion._id);
+      console.log("Daily Aptitude assigned:", result.dailyQuestion._id);
     } else {
-      console.log("⚠️ Skipped:", result.message);
+      console.log("Skipped:", result.message);
     }
   } catch (err) {
-    console.error("❌ Cron job failed:", err);
+    console.error("Cron job failed:", err);
   }
 });
