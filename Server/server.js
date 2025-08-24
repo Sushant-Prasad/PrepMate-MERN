@@ -9,6 +9,8 @@ import aptitudeQuestionRoutes from "./routes/AptitudeQuestionRouter.js";
 import dailyAptitudeRoutes from "./routes/DailyAptitudeQuestionRouter.js";
 import userAptitudeSubmissionRouter from "./routes/UserAptitudeSubmissionRouter.js";
 import UserDSASubmissionRouter from "./routes/UserDSASubmissionRouter.js";
+import authRouter from "./routes/authRouter.js";
+import profileRouter from "./routes/UserProfileRouter.js";
 
 
 
@@ -36,6 +38,8 @@ app.use("/api/aptitude-questions", aptitudeQuestionRoutes);
 app.use("/api/daily-aptitude", dailyAptitudeRoutes);
 app.use("/api/aptitude-submission", userAptitudeSubmissionRouter);
 app.use("/api/dsa-submission", UserDSASubmissionRouter);
+app.use("/api/users", authRouter);
+app.use("/api/profiles", profileRouter);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
