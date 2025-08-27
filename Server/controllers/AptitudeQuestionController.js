@@ -97,3 +97,36 @@ export const deleteAptiQuestion = async (req, res) => {
     });
   }
 };
+/**
+ * Update an aptitude question by ID
+ */
+export const updateAptiQuestion = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updatedQuestion = await AptitudeQuestion.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true } // return updated doc + validate schema
+    );
+
+    if (!updatedQuestion) {
+      return res.status(404).json({
+        success: false,
+        message: "Question not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Question updated successfully",
+      data: updatedQuestion,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Failed to update question",
+      error: error.message,
+    });
+  }
+};

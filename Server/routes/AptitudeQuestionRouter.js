@@ -5,6 +5,7 @@ import {
   getAptiQuestions,
   getAptiQuestionById,
   deleteAptiQuestion,
+  updateAptiQuestion,
 } from "../controllers/AptitudeQuestionController.js";
 
 const aptitudeQuestionRoutes = express.Router();
@@ -13,5 +14,6 @@ aptitudeQuestionRoutes.post("/", createAptiQuestion);
 aptitudeQuestionRoutes.get("/", getAptiQuestions);
 aptitudeQuestionRoutes.get("/:id", getAptiQuestionById);
 aptitudeQuestionRoutes.delete("/:id", deleteAptiQuestion);
+aptitudeQuestionRoutes.put("/:id", updateAptiQuestion);
 
 export default aptitudeQuestionRoutes;

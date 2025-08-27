@@ -1,4 +1,5 @@
 import DSAQuestion from "../models/DSAQuestion.js";
+import mongoose from "mongoose";
 
 /**
  * @desc   Get all DSA questions
@@ -189,5 +190,94 @@ export const getDSAByDifficulty = async (req, res) => {
     res.status(200).json({ success: true, data: questions });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+/**
+ * @desc   Update a DSA question (partial update)
+ * @route  PUT /api/dsa-questions/:id
+ * @access Admin
+ */
+export const updateDSA = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid question id" });
+    }
+
+    // Allow only whitelisted fields to be updated
+    const allowed = [
+      "title",
+      "description",
+      "difficulty",
+      "constraints",
+      "inputFormat",
+      "outputFormat",
+      "testCases",
+      "starterCode",
+      "solution",
+      "tags",
+      "companyTags",
+      "timeLimit",
+      "memoryLimit",
+      "languagesSupported",
+    ];
+    const payload = {};
+    for (const key of allowed) {
+      if (key in req.body) payload[key] = req.body[key];
+    }
+
+    const updated = await DSAQuestion.findByIdAndUpdate(id, payload, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Question not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "DSA Question updated successfully",
+      data: updated,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: "Failed to update question",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc   Delete a DSA question
+ * @route  DELETE /api/dsa-questions/:id
+ * @access Admin
+ */
+export const deleteDSA = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid question id" });
+    }
+
+    const deleted = await DSAQuestion.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Question not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "DSA Question deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete question",
+      error: error.message,
+    });
   }
 };
