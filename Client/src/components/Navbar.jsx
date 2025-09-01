@@ -43,8 +43,12 @@ function Navbar() {
           ))}
 
           <div className="flex gap-3">
-            <Button variant="outline">Login</Button>
-            <Button>Signup</Button>
+            <Button variant="outline" asChild>
+              <a href="/login">Login</a>
+            </Button>
+            <Button asChild>
+              <a href="/register">Signup</a>
+            </Button>
           </div>
         </div>
 
@@ -79,10 +83,12 @@ function Navbar() {
               ))}
 
               <div className="flex gap-3 pt-4">
-                <Button variant="outline" className="w-full">
-                  Login
+                <Button variant="outline" asChild className="w-full">
+                  <a href="/login" onClick={() => setIsOpen(false)}>Login</a>
                 </Button>
-                <Button className="w-full">Signup</Button>
+                <Button asChild className="w-full">
+                  <a href="/register" onClick={() => setIsOpen(false)}>Signup</a>
+                </Button>
               </div>
             </div>
           </motion.div>

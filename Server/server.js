@@ -12,24 +12,22 @@ import UserDSASubmissionRouter from "./routes/UserDSASubmissionRouter.js";
 import authRouter from "./routes/authRouter.js";
 import profileRouter from "./routes/UserProfileRouter.js";
 
-
-
 dotenv.config();
-
-const corsOptions = {
-  origin: "http://localhost:5173", // Allow requests from frontend
- // credentials: true // Allow cookies to be sent from frontend
-};
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ✅ FIX: allow cookies from frontend
+const corsOptions = {
+  origin: "http://localhost:5173", // React frontend
+  credentials: true,               // 🔑 required for HttpOnly cookies
+};
 
-app.use(cors(corsOptions)); // Enable CORS with defined options
-app.use(cookieParser());// Parse cookies from incoming requests
+// Middleware
+app.use(cors(corsOptions));
+app.use(cookieParser()); // Parse cookies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 // Routes
 app.use("/api/dsa-questions", dsaQuestionRoutes);
@@ -41,25 +39,25 @@ app.use("/api/dsa-submission", UserDSASubmissionRouter);
 app.use("/api/users", authRouter);
 app.use("/api/profiles", profileRouter);
 
-// Global error handling middleware
+// Global error handler
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500; // Default to 500 if no status
-  const message = err.message || "internal server error"; // Default message
-  res.status(statusCode).json({ error: message }); // Send error response
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal server error";
+  res.status(statusCode).json({ success: false, message });
 });
 
-// Function to start the server after connecting to DB
+// Start server
 const startServer = async () => {
   try {
-    await connectToDB(); // Connect to MongoDB
-    console.log("DB connected successfully!");
+    await connectToDB();
+    console.log("✅ DB connected successfully!");
 
     app.listen(PORT, () => {
-      console.log(`Server is listening at http://localhost:${PORT}`);
+      console.log(`🚀 Server running at http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("Failed to start server:", error);
+    console.error("❌ Failed to start server:", error);
   }
 };
 
-startServer(); // Start the server
+startServer();

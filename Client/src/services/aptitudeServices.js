@@ -4,9 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 /* ------------------------- Axios instance ------------------------- */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api/",
-  withCredentials: false, // set true if you use httpOnly cookies
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api",
+  withCredentials: true, // ✅ include HttpOnly cookie JWT in every request
 });
+
 /* -------------------------- Query Keys ---------------------------- */
 export const aptitudeKeys = {
   all: ["aptitude"],
@@ -26,32 +27,32 @@ const toQuery = (params = {}) => {
 };
 
 /* --------------------------- Fetchers ----------------------------- */
-// GET /api/aptitude?category=&subCategory=&company=
+// GET /api/aptitude-questions?category=&subCategory=&company=
 export const fetchAptiQuestions = async (filters = {}) => {
   const q = toQuery(filters);
-  const { data } = await api.get(`/aptitude-questions/${q}`);
+  const { data } = await api.get(`/aptitude-questions${q}`);
   return data; // { success, count, data: [...] }
 };
 
-// GET /api/aptitude/:id
+// GET /api/aptitude-questions/:id
 export const fetchAptiQuestionById = async (id) => {
   const { data } = await api.get(`/aptitude-questions/${id}`);
   return data; // { success, data: {...} }
 };
 
-// POST /api/aptitude
+// POST /api/aptitude-questions (Admin only)
 export const createAptiQuestionApi = async (payload) => {
   const { data } = await api.post(`/aptitude-questions`, payload);
   return data; // { success, message, data }
 };
 
-// PUT /api/aptitude/:id
+// PUT /api/aptitude-questions/:id (Admin only)
 export const updateAptiQuestionApi = async ({ id, payload }) => {
   const { data } = await api.put(`/aptitude-questions/${id}`, payload);
   return data; // { success, message, data }
 };
 
-// DELETE /api/aptitude/:id
+// DELETE /api/aptitude-questions/:id (Admin only)
 export const deleteAptiQuestionApi = async (id) => {
   const { data } = await api.delete(`/aptitude-questions/${id}`);
   return data; // { success, message }
@@ -77,7 +78,7 @@ export const useAptiQuestion = (id, options = {}) =>
     ...options,
   });
 
-// Create
+// Create (admin only)
 export const useCreateAptiQuestion = (options = {}) => {
   const qc = useQueryClient();
   return useMutation({
@@ -96,7 +97,7 @@ export const useCreateAptiQuestion = (options = {}) => {
   });
 };
 
-// Update
+// Update (admin only)
 export const useUpdateAptiQuestion = (options = {}) => {
   const qc = useQueryClient();
   return useMutation({
@@ -112,7 +113,7 @@ export const useUpdateAptiQuestion = (options = {}) => {
   });
 };
 
-// Delete
+// Delete (admin only)
 export const useDeleteAptiQuestion = (options = {}) => {
   const qc = useQueryClient();
   return useMutation({
