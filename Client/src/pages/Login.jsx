@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -9,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,11 +23,14 @@ const Login = () => {
       const { data } = await axios.post(
         "http://localhost:3001/api/users/login",
         { email, password },
-        { withCredentials: true } // 👈 important for HttpOnly cookie
+        { withCredentials: true } // important for HttpOnly cookie
       );
 
       // Save only user info (not token, since we use cookies)
       localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Notify parent (App) so Navbar updates immediately
+      if (onLogin) onLogin(data.user);
 
       navigate("/"); // redirect after login
     } catch (err) {

@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Search, Flame, Zap } from "lucide-react";
+import { Menu, X, Search, Flame, Zap, ChevronDown, User } from "lucide-react";
 import { FaFireAlt } from "react-icons/fa";
 import { IoFlash } from "react-icons/io5";
-function Navbar() {
+import { FaUserCircle } from "react-icons/fa";
+
+function Navbar({ user = null, onLogout = () => {} }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const avatarRef = useRef(null);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -24,6 +28,16 @@ function Navbar() {
     e.preventDefault();
     console.log("Searching for:", searchQuery);
   };
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (avatarRef.current && !avatarRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+    window.addEventListener("mousedown", handleClickOutside);
+    return () => window.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
@@ -70,26 +84,70 @@ function Navbar() {
 
           {/* Streak Icons */}
           <div className="flex items-center gap-6 ml-2">
-            {/* DSA Streak */}
             <a href="/dsa-streak" className="flex flex-col items-center">
               <FaFireAlt className="text-red-500 w-6 h-6" />
               <span className="text-xs font-semibold text-gray-700">{dsaStreak}</span>
             </a>
-            {/* Aptitude Streak */}
             <a href="/aptitude-streak" className="flex flex-col items-center">
               <IoFlash className="text-yellow-400 w-6 h-6" />
               <span className="text-xs font-semibold text-gray-700">{aptitudeStreak}</span>
             </a>
           </div>
 
-          {/* Auth Buttons */}
-          <div className="flex gap-3 ml-4">
-            <Button variant="outline" asChild>
-              <a href="/login">Login</a>
-            </Button>
-            <Button asChild>
-              <a href="/register">Signup</a>
-            </Button>
+          {/* Auth Buttons / User Icon */}
+          <div className="flex items-center gap-3 ml-4">
+            {!user ? (
+              <>
+                <Button variant="outline" asChild>
+                  <a href="/login">Login</a>
+                </Button>
+                <Button asChild>
+                  <a href="/register">Signup</a>
+                </Button>
+              </>
+            ) : (
+              <div className="relative" ref={avatarRef}>
+                <button
+                  onClick={() => setMenuOpen((s) => !s)}
+                  className="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-gray-100 transition"
+                  aria-haspopup="true"
+                  aria-expanded={menuOpen}
+                >
+                  <FaUserCircle className="w-10 h-10 text-slate-600" />
+                  
+                </button>
+
+                {/* Dropdown */}
+                <AnimatePresence>
+                  {menuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                      transition={{ duration: 0.12 }}
+                      className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50"
+                    >
+                      <a
+                        href="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Profile
+                      </a>
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false);
+                          onLogout();
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Logout
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
         </div>
 
@@ -139,27 +197,50 @@ function Navbar() {
               {/* Streak Icons - Mobile */}
               <div className="flex items-center gap-6 pt-2">
                 <a href="/dsa-streak" className="flex flex-col items-center">
-                  <FaFireAlt className="text-red-500 w-6 h-6" />
+                  <Flame className="text-orange-500 w-6 h-6" />
                   <span className="text-xs font-semibold text-gray-700">{dsaStreak}</span>
                 </a>
                 <a href="/aptitude-streak" className="flex flex-col items-center">
-                  <IoFlash className="text-yellow-500 w-6 h-6" />
+                  <Zap className="text-yellow-500 w-6 h-6" />
                   <span className="text-xs font-semibold text-gray-700">{aptitudeStreak}</span>
                 </a>
               </div>
 
-              {/* Auth Buttons */}
-              <div className="flex gap-3 pt-4">
-                <Button variant="outline" asChild className="w-full">
-                  <a href="/login" onClick={() => setIsOpen(false)}>
-                    Login
-                  </a>
-                </Button>
-                <Button asChild className="w-full">
-                  <a href="/register" onClick={() => setIsOpen(false)}>
-                    Signup
-                  </a>
-                </Button>
+              {/* Auth Buttons / User Icon - Mobile */}
+              <div className="pt-2">
+                {!user ? (
+                  <div className="flex gap-3">
+                    <Button variant="outline" asChild className="w-full">
+                      <a href="/login" onClick={() => setIsOpen(false)}>
+                        Login
+                      </a>
+                    </Button>
+                    <Button asChild className="w-full">
+                      <a href="/register" onClick={() => setIsOpen(false)}>
+                        Signup
+                      </a>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="/profile"
+                      className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Profile
+                    </a>
+                    <button
+                      onClick={() => {
+                        setIsOpen(false);
+                        onLogout();
+                      }}
+                      className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
