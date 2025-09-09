@@ -15,6 +15,9 @@ import StudyRoom from "./pages/StudyRoom";
 import CompanyPrep from "./pages/CompanyPrep";
 import DSASubmit from "./components/DSASubmit";
 import axios from "axios";
+import AptiStreak from "./pages/AptiStreak";
+import DSAStreak from "./pages/DSAStreak";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +74,11 @@ function Root() {
             <Route path="/aptitude" element={<Aptitude />} />
             <Route path="/company" element={<CompanyPrep />} />
             <Route path="/rooms" element={<StudyRoom />} />
+            <Route path="/aptitude-streak" element={<AptiStreak />} />
+            <Route path="/dsa-streak" element={<DSAStreak />} />
+            <Route path="/profile" element={<Profile/>} />
+
+
           </Route>
 
           {/* 404 fallback */}
