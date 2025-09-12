@@ -1,16 +1,49 @@
+// src/components/Navbar.jsx
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Search, Flame, Zap, ChevronDown, User } from "lucide-react";
+import { Menu, X, Flame, Zap } from "lucide-react";
 import { FaFireAlt } from "react-icons/fa";
 import { IoFlash } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
+import { useUserProfile } from "@/services/profileServices";
+import logoSrc from "@/assets/FullLogo.jpg"; 
 
 function Navbar({ user = null, onLogout = () => {} }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const avatarRef = useRef(null);
+
+  // derive current userId from localStorage (same parsing logic used across app)
+  let storedUser = null;
+  try {
+    const raw = localStorage.getItem("user");
+    if (raw) storedUser = JSON.parse(raw);
+  } catch (e) {
+    // ignore parse errors
+  }
+  const userId = storedUser?.id ?? storedUser?._id ?? storedUser?.userId ?? null;
+
+  // useUserProfile will be disabled when there's no userId
+  const { data: profileResp, isLoading: profileLoading } = useUserProfile(userId, { enabled: !!userId });
+
+  // normalize profile object (your fetcher sometimes returns { success, data })
+  const profile = profileResp?.data ?? profileResp ?? null;
+
+  // Safely extract streak numbers (support multiple shapes)
+  const safeNumber = (v) => {
+    if (v == null) return 0;
+    if (typeof v === "number") return v;
+    if (typeof v === "object") {
+      return v.currentStreak ?? v.current ?? v.value ?? 0;
+    }
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  // Use profile dsa/aptitude streaks if available; fall back to 0
+  const dsaStreak = safeNumber(profile?.dsaStreak ?? profile?.streaks?.dsa ?? null);
+  const aptitudeStreak = safeNumber(profile?.aptitudeStreak ?? profile?.streaks?.aptitude ?? null);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -19,15 +52,6 @@ function Navbar({ user = null, onLogout = () => {} }) {
     { name: "Study Rooms", href: "/rooms" },
     { name: "CompanyPrep", href: "/company" },
   ];
-
-  // Temporary streak values
-  const dsaStreak = 5;
-  const aptitudeStreak = 3;
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log("Searching for:", searchQuery);
-  };
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -40,63 +64,74 @@ function Navbar({ user = null, onLogout = () => {} }) {
   }, []);
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <motion.a
+    <nav className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        {/* Logo (image) + Text */}
+        <a
           href="/"
-          className="text-2xl font-extrabold text-indigo-600 tracking-tight"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
+          className="flex items-center gap-3 no-underline"
+          aria-label="PrepMate home"
         >
-          PrepMate
-        </motion.a>
-
-        {/* Search Bar - Desktop */}
-        <div className="hidden lg:flex items-center mx-8 flex-1 max-w-md">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search topics, questions..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          {/* logo image */}
+          <div
+            className="flex items-center justify-center  "
+            
+          >
+            <img
+              src={logoSrc}
+              alt="PrepMate logo"
+              className="w-16 h-16 p-0"
+             
             />
           </div>
-        </div>
+
+          {/* brand text */}
+          <div className="leading-tight">
+            <div className="text-2xl font-bold tracking-tight text-[#3DBFD9]">
+              <span className="text-2xl font-bold tracking-tight text-[#3DBFD9]">
+              Prep
+              </span>
+             <span className="text-2xl font-bold tracking-tight text-[#03045e]">
+             Mate
+             </span>
+              
+            </div>
+          </div>
+        </a>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-6">
-          {navLinks.map((link, i) => (
-            <motion.a
-              key={i}
-              href={link.href}
-              className="text-gray-700 hover:text-indigo-600 font-medium transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {link.name}
-            </motion.a>
-          ))}
-
-          {/* Streak Icons */}
-          <div className="flex items-center gap-6 ml-2">
-            <a href="/dsa-streak" className="flex flex-col items-center">
-              <FaFireAlt className="text-red-500 w-6 h-6" />
-              <span className="text-xs font-semibold text-gray-700">{dsaStreak}</span>
-            </a>
-            <a href="/aptitude-streak" className="flex flex-col items-center">
-              <IoFlash className="text-yellow-400 w-6 h-6" />
-              <span className="text-xs font-semibold text-gray-700">{aptitudeStreak}</span>
-            </a>
+          <div className="flex items-center gap-6">
+            {navLinks.map((link, i) => (
+              <motion.a
+                key={i}
+                href={link.href}
+                className="text-slate-700 hover:text-indigo-600 font-medium transition-colors"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                {link.name}
+              </motion.a>
+            ))}
           </div>
+
+          {/* Streak Icons — only show when logged in */}
+          {userId && (
+            <div className="flex items-center gap-6 ml-3">
+              <a href="/dsa-streak" className="flex flex-col items-center" title="DSA Streak">
+                <FaFireAlt className="text-red-500 w-6 h-6" />
+                <span className="text-xs font-semibold text-slate-700">{profileLoading ? "…" : dsaStreak}</span>
+              </a>
+              <a href="/aptitude-streak" className="flex flex-col items-center" title="Aptitude Streak">
+                <IoFlash className="text-yellow-400 w-6 h-6" />
+                <span className="text-xs font-semibold text-slate-700">{profileLoading ? "…" : aptitudeStreak}</span>
+              </a>
+            </div>
+          )}
 
           {/* Auth Buttons / User Icon */}
           <div className="flex items-center gap-3 ml-4">
-            {!user ? (
+            {!user && !userId ? (
               <>
                 <Button variant="outline" asChild>
                   <a href="/login">Login</a>
@@ -114,7 +149,11 @@ function Navbar({ user = null, onLogout = () => {} }) {
                   aria-expanded={menuOpen}
                 >
                   <FaUserCircle className="w-10 h-10 text-slate-600" />
-                  
+                  <div className="hidden sm:block text-left">
+                    <div className="text-sm font-medium text-slate-800 truncate" style={{ maxWidth: 140 }}>
+                      {profile?.name ?? storedUser?.name ?? "You"}
+                    </div>
+                  </div>
                 </button>
 
                 {/* Dropdown */}
@@ -125,7 +164,7 @@ function Navbar({ user = null, onLogout = () => {} }) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.98 }}
                       transition={{ duration: 0.12 }}
-                      className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50"
+                      className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50"
                     >
                       <a
                         href="/profile"
@@ -167,22 +206,9 @@ function Navbar({ user = null, onLogout = () => {} }) {
             initial={{ height: 0 }}
             animate={{ height: "auto" }}
             exit={{ height: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.28 }}
           >
             <div className="flex flex-col px-6 py-4 space-y-4">
-              {/* Mobile Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search topics, questions..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                />
-              </div>
-
               {navLinks.map((link, i) => (
                 <a
                   key={i}
@@ -194,40 +220,34 @@ function Navbar({ user = null, onLogout = () => {} }) {
                 </a>
               ))}
 
-              {/* Streak Icons - Mobile */}
-              <div className="flex items-center gap-6 pt-2">
-                <a href="/dsa-streak" className="flex flex-col items-center">
-                  <Flame className="text-orange-500 w-6 h-6" />
-                  <span className="text-xs font-semibold text-gray-700">{dsaStreak}</span>
-                </a>
-                <a href="/aptitude-streak" className="flex flex-col items-center">
-                  <Zap className="text-yellow-500 w-6 h-6" />
-                  <span className="text-xs font-semibold text-gray-700">{aptitudeStreak}</span>
-                </a>
-              </div>
+              {/* Streak Icons - Mobile (only when logged in) */}
+              {userId && (
+                <div className="flex items-center gap-6 pt-2">
+                  <a href="/dsa-streak" className="flex flex-col items-center">
+                    <Flame className="text-orange-500 w-6 h-6" />
+                    <span className="text-xs font-semibold text-gray-700">{profileLoading ? "…" : dsaStreak}</span>
+                  </a>
+                  <a href="/aptitude-streak" className="flex flex-col items-center">
+                    <Zap className="text-yellow-500 w-6 h-6" />
+                    <span className="text-xs font-semibold text-gray-700">{profileLoading ? "…" : aptitudeStreak}</span>
+                  </a>
+                </div>
+              )}
 
               {/* Auth Buttons / User Icon - Mobile */}
               <div className="pt-2">
-                {!user ? (
+                {!user && !userId ? (
                   <div className="flex gap-3">
                     <Button variant="outline" asChild className="w-full">
-                      <a href="/login" onClick={() => setIsOpen(false)}>
-                        Login
-                      </a>
+                      <a href="/login" onClick={() => setIsOpen(false)}>Login</a>
                     </Button>
                     <Button asChild className="w-full">
-                      <a href="/register" onClick={() => setIsOpen(false)}>
-                        Signup
-                      </a>
+                      <a href="/register" onClick={() => setIsOpen(false)}>Signup</a>
                     </Button>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    <a
-                      href="/profile"
-                      className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsOpen(false)}
-                    >
+                    <a href="/profile" className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100" onClick={() => setIsOpen(false)}>
                       Profile
                     </a>
                     <button
