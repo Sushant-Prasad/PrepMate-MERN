@@ -80,7 +80,7 @@ function Navbar({ user = null, onLogout = () => {} }) {
             <img
               src={logoSrc}
               alt="PrepMate logo"
-              className="w-16 h-16 p-0"
+              className="w-12 h-12 p-0"
              
             />
           </div>
