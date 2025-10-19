@@ -21,6 +21,7 @@ import DSAStreak from "./pages/DSAStreak";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminLayout from "./layouts/AdminLayout";
+import AdminUsers from "./pages/Admin/AdminUsers";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,7 @@ function Root() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUsers/>} />
           </Route>
 
           {/* 404 fallback */}
