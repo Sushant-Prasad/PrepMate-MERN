@@ -20,7 +20,7 @@ import AptiStreak from "./pages/AptiStreak";
 import DSAStreak from "./pages/DSAStreak";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminLayout from "./pages/AdminLayout";
+import AdminLayout from "./layouts/AdminLayout";
 
 const queryClient = new QueryClient();
 
