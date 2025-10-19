@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// src/pages/Login.jsx
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -10,29 +11,75 @@ import { Separator } from "@/components/ui/separator";
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state?.from ?? null;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  // ref to hold redirect timer so we can clear on unmount
+  const redirectTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccessMessage(null);
+
     try {
       const { data } = await axios.post(
-        "http://localhost:3001/api/users/login",
+        `${import.meta.env.VITE_API_URL || "http://localhost:3001/api"}/users/login`,
         { email, password },
-        { withCredentials: true } // important for HttpOnly cookie
+        { withCredentials: true }
       );
 
-      // Save only user info (not token, since we use cookies)
-      localStorage.setItem("user", JSON.stringify(data.user));
+      const user = data?.user ?? data;
 
-      // Notify parent (App) so Navbar updates immediately
-      if (onLogin) onLogin(data.user);
+      // persist non-sensitive user info
+      try {
+        localStorage.setItem("user", JSON.stringify(user));
+      } catch (err) {
+        console.warn("Could not persist user to localStorage", err);
+      }
 
-      navigate("/"); // redirect after login
+      // notify parent
+      if (typeof onLogin === "function") onLogin(user);
+
+      // decide destination and friendly message
+      const isAdmin =
+        user?.isAdmin === true ||
+        (typeof user?.role === "string" && user.role.toLowerCase() === "admin");
+
+      let message;
+      let targetPath;
+      if (from) {
+        message = "Login successful! Redirecting to your previous page…";
+        targetPath = from;
+      } else if (isAdmin) {
+        message = "Login successful! Redirecting to admin dashboard...";
+        targetPath = "/admin/dashboard";
+      } else {
+        message = "Login successful! Redirecting to homepage...";
+        targetPath = "/";
+      }
+
+      setSuccessMessage(message);
+
+      // short delay so user can read the message
+      redirectTimerRef.current = setTimeout(() => {
+        navigate(targetPath, { replace: true });
+      }, 1200);
     } catch (err) {
       setError(err?.response?.data?.message || "Login failed");
     } finally {
@@ -54,8 +101,24 @@ const Login = ({ onLogin }) => {
               Login
             </CardTitle>
           </CardHeader>
+
           <Separator />
+
           <CardContent className="pt-6">
+            {/* success message banner */}
+            {successMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+                className="mb-4 rounded-md bg-green-50 border border-green-100 text-green-800 px-4 py-2 text-sm font-medium"
+                role="status"
+                aria-live="polite"
+              >
+                {successMessage}
+              </motion.div>
+            )}
+
             <form className="space-y-5" onSubmit={handleLogin}>
               <div>
                 <Label htmlFor="email">Email</Label>
