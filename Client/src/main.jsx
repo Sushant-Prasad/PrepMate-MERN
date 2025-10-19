@@ -22,6 +22,8 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminUsers from "./pages/Admin/AdminUsers";
+import AdminDSA from "./pages/Admin/AdminDSA";
+import AdminAptitude from "./pages/Admin/AdminAptitude";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +90,9 @@ function Root() {
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers/>} />
+            <Route path="/admin/dsa-questions" element={<AdminDSA/>} />
+            <Route path="/admin/aptitude-questions" element={<AdminAptitude/>} />
+            
           </Route>
 
           {/* 404 fallback */}
