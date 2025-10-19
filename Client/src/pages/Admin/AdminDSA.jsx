@@ -257,11 +257,6 @@ export default function AdminDSA() {
     <div className="min-h-screen">
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-2xl font-extrabold">Manage DSA Questions</h2>
-            <div className="text-sm text-gray-500">Create, edit and remove questions used on the platform.</div>
-          </div>
-
           <div className="flex items-center gap-3">
             <Input placeholder="Search by title or tag…" value={query} onChange={(e) => setQuery(e.target.value)} className="w-64" />
             <Button onClick={() => refetch()} variant="outline">Refresh</Button>
