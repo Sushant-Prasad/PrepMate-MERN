@@ -19,7 +19,7 @@ import axios from "axios";
 import AptiStreak from "./pages/AptiStreak";
 import DSAStreak from "./pages/DSAStreak";
 import Profile from "./pages/Profile";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminLayout from "./layouts/AdminLayout";
 
 const queryClient = new QueryClient();
