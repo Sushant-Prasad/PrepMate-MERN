@@ -1,9 +1,10 @@
+// src/main.jsx
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DSA from "./pages/DSA";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import Reg from "./pages/Reg";
 import Error from "./pages/Error";
 import Home from "./pages/Home";
@@ -18,6 +19,8 @@ import axios from "axios";
 import AptiStreak from "./pages/AptiStreak";
 import DSAStreak from "./pages/DSAStreak";
 import Profile from "./pages/Profile";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminLayout from "./pages/AdminLayout";
 
 const queryClient = new QueryClient();
 
@@ -41,13 +44,16 @@ function Root() {
     try {
       // optional: notify backend to clear HttpOnly cookie/session
       await axios.post(
-        "http://localhost:3001/api/users/logout",
+        `${import.meta.env.VITE_API_URL || "http://localhost:3001/api"}/users/logout`,
         {},
         { withCredentials: true }
       );
     } catch (err) {
       // ignore errors but console.log for debugging
-      console.warn("Logout request failed (proceeding with client-side logout)", err);
+      console.warn(
+        "Logout request failed (proceeding with client-side logout)",
+        err
+      );
     } finally {
       localStorage.removeItem("user");
       setUser(null);
@@ -61,24 +67,25 @@ function Root() {
       <Toaster position="top-center" />
       <BrowserRouter>
         <Routes>
-          {/* Pass user + onLogout to AppLayout so Navbar receives them */}
+          {/* AppLayout wraps the main public/app pages */}
           <Route element={<AppLayout user={user} onLogout={handleLogout} />}>
-            <Route path="/" element={<Home />} />
-            <Route
-              path="/login"
-              element={<Login onLogin={(u) => setUser(u)} />}
-            />
-            <Route path="/register" element={<Reg />} />
-            <Route path="/dsa" element={<DSA />} />
-            <Route path="/dsa/submit/:id" element={<DSASubmit />} />
-            <Route path="/aptitude" element={<Aptitude />} />
-            <Route path="/company" element={<CompanyPrep />} />
-            <Route path="/rooms" element={<StudyRoom />} />
-            <Route path="/aptitude-streak" element={<AptiStreak />} />
-            <Route path="/dsa-streak" element={<DSAStreak />} />
-            <Route path="/profile" element={<Profile/>} />
+            <Route index element={<Home />} />
+            <Route path="login" element={<Login onLogin={(u) => setUser(u)} />} />
+            <Route path="register" element={<Reg />} />
+            <Route path="dsa" element={<DSA />} />
+            <Route path="dsa/submit/:id" element={<DSASubmit />} />
+            <Route path="aptitude" element={<Aptitude />} />
+            <Route path="company" element={<CompanyPrep />} />
+            <Route path="rooms" element={<StudyRoom />} />
+            <Route path="aptitude-streak" element={<AptiStreak />} />
+            <Route path="dsa-streak" element={<DSAStreak />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
 
-
+          {/* Admin area - separate layout (does not use AppLayout) */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
           </Route>
 
           {/* 404 fallback */}
