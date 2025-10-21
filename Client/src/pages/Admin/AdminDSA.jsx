@@ -248,7 +248,7 @@ export default function AdminDSA() {
   if (isError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-600">Failed to load questions: {String(error?.message ?? error)}</div>
+        <div className="text-red-500">Failed to load questions: {String(error?.message ?? error)}</div>
       </div>
     );
   }
@@ -310,7 +310,7 @@ export default function AdminDSA() {
                         <td className="py-3 px-3 align-top">
                           <div className="flex items-center gap-2">
                             <Button size="sm" variant="outline" onClick={() => openEditModal(q)}>Edit</Button>
-                            <Button size="sm" variant="destructive" onClick={() => handleDelete(q)}>Delete</Button>
+                            <Button className ="bg-red-600"size="sm" variant="destructive" onClick={() => handleDelete(q)}>Delete</Button>
                             <Button size="sm" onClick={() => navigate(`/dsa/submit/${q._id ?? q.id}`)}>Open</Button>
                           </div>
                         </td>
