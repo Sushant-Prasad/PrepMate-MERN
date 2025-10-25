@@ -1,3 +1,4 @@
+// src/pages/AdminLayout.jsx
 import React, { useEffect, useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
@@ -10,6 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoSrc from "@/assets/FullLogo.jpg";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -105,35 +107,37 @@ export default function AdminLayout() {
         } md:translate-x-0`}
       >
         <div className="h-full flex flex-col">
-          {/* Logo Section */}
+          {/* Logo Section - MATCHES Navbar branding */}
           <div className="px-6 py-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 shadow-lg shadow-indigo-200">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden
-                  >
-                    <path
-                      d="M6 12c1.5-4 5-6 9-6-1 4-3 7-6 9-2-2-3-3-3-3z"
-                      fill="currentColor"
-                    />
-                  </svg>
+                {/* logo image */}
+                <div className="flex items-center justify-center">
+                  <img src={logoSrc} alt="PrepMate" className="w-12 h-12 p-0" />
                 </div>
+
+                {/* brand text: two-tone similar to Navbar */}
                 <div>
-                  <div className="text-xl font-bold bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent">
-                    PrepMate
-                  </div>
-                  <div className="text-xs font-medium text-indigo-600 uppercase tracking-wide">
-                    Admin Panel
+                  <div className="text-xl font-bold leading-tight">
+                    <span
+                      className="text-2xl font-bold tracking-tight"
+                      style={{ color: "#3DBFD9" }}
+                    >
+                      Prep
+                    </span>
+                    <span
+                      className="text-2xl font-bold tracking-tight"
+                      style={{ color: "#03045e" }}
+                    >
+                      Mate
+                    </span>
                   </div>
                 </div>
               </div>
               <button
                 className="md:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                 onClick={() => setSidebarOpen(false)}
+                aria-label="Close sidebar"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
@@ -159,7 +163,7 @@ export default function AdminLayout() {
           <div className="px-4 py-5 border-t border-gray-100 bg-gradient-to-br from-gray-50 to-white">
             <div className="flex items-center gap-3 px-3 py-2 mb-3 rounded-lg bg-white border border-gray-200">
               <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold text-sm shadow-md">
-                {storedUser?.name?.charAt(0).toUpperCase() ?? "A"}
+                {storedUser?.name?.charAt(0)?.toUpperCase() ?? "A"}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-semibold text-gray-900 truncate">
@@ -197,15 +201,13 @@ export default function AdminLayout() {
                 <Menu className="w-5 h-5 text-gray-700" />
               </button>
 
-              <div>
-                <div className="text-lg font-bold text-gray-900">
-                  Admin Dashboard
-                </div>
-                <div className="text-xs text-gray-500">
-                  Welcome back, {storedUser?.name ?? "Admin"}
-                </div>
+              {/* Small branding on topbar - use same logo + two-tone text */}
+              <div className="flex items-center gap-3">
+                <div className="text-xl text-gray-900">Admin Panel</div>
               </div>
             </div>
+
+            <div />
           </div>
         </header>
 
