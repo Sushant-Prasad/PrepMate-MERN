@@ -62,22 +62,6 @@ export default function Aptitude() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
-        {/* Enhanced Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8 text-center"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3">
-            Aptitude Practice
-          </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Master your aptitude skills with our comprehensive question bank.
-            Choose a category and dive into focused practice.
-          </p>
-        </motion.div>
-
         {/* Responsive Layout */}
         <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-[280px_1fr_320px] lg:gap-8 lg:items-start">
           {/* Mobile/Tablet: Categories as horizontal scroll */}
