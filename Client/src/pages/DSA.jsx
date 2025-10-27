@@ -73,16 +73,6 @@ export default function DSA() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <div className="mx-auto max-w-7xl px-4 py-6 md:py-10">
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-6"
-        >
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800">DSA Practice</h1>
-          <p className="text-gray-600 mt-1">Browse topics on the left, filter problems, and click a problem to solve it.</p>
-        </motion.div>
-
         {/* Responsive Layout */}
         <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-[260px_1fr] lg:gap-6 lg:items-start">
           {/* Mobile: Topics as horizontal scroll */}
