@@ -12,11 +12,6 @@ import { Badge } from "@/components/ui/badge";
 
 const CATEGORIES = ["Numerical Ability", "Reasoning", "Verbal Ability"];
 
-// Theme colors
-const PRIMARY = "#3DBFD9";
-const SECONDARY = "#03045e";
-const GRADIENT = `linear-gradient(90deg, ${PRIMARY}, ${SECONDARY})`;
-
 // Abbreviated versions for very small screens
 const getCategoryDisplay = (cat, isSmall = false) => {
   if (!isSmall) return cat;
@@ -64,7 +59,7 @@ export default function Aptitude() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(180deg,#f7feff,#f1f7ff)" }}>
+    <div className="min-h-screen bg-gradient-to-b from-[#f7feff] to-[#f1f7ff]">
       <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
         {/* Responsive Layout */}
         <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-[280px_1fr_320px] lg:gap-8 lg:items-start">
@@ -72,7 +67,7 @@ export default function Aptitude() {
           <div className="lg:hidden">
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
               <Card className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader style={{ background: GRADIENT, color: "white" }}>
+                <CardHeader className="bg-gradient-to-r from-brand-primary to-brand-secondary text-white">
                   <CardTitle className="text-lg font-semibold">Categories</CardTitle>
                 </CardHeader>
                 <ScrollArea className="w-full">
@@ -83,12 +78,11 @@ export default function Aptitude() {
                           key={cat}
                           variant={selectedCategory === cat ? "default" : "outline"}
                           onClick={() => handleSelectCategory(cat)}
-                          className={`shrink-0 whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2.5 h-auto min-w-0 rounded-full font-medium transition-all duration-200`}
-                          style={
+                          className={`shrink-0 whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2.5 h-auto min-w-0 rounded-full font-medium transition-all duration-200 ${
                             selectedCategory === cat
-                              ? { background: GRADIENT, color: "white", boxShadow: "0 6px 18px rgba(3,4,94,0.08)" }
-                              : { borderColor: "#e6f7fb" }
-                          }
+                              ? "bg-gradient-to-r from-brand-primary to-brand-secondary text-white shadow-lg"
+                              : "border border-gray-100"
+                          }`}
                         >
                           <span className="block sm:hidden">{getCategoryDisplay(cat, true)}</span>
                           <span className="hidden sm:block">{getCategoryDisplay(cat, false)}</span>
@@ -105,11 +99,11 @@ export default function Aptitude() {
           <div className="lg:hidden">
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
               <Card className="overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader style={{ background: GRADIENT, color: "white" }}>
+                <CardHeader className="bg-gradient-to-r from-brand-primary to-brand-secondary text-white">
                   <CardTitle className="text-lg font-semibold flex items-center justify-between">
                     Subcategories
                     {selectedSub && (
-                      <Badge style={{ background: `${PRIMARY}22`, color: PRIMARY, border: `1px solid ${PRIMARY}33` }} className="bg-white/20">
+                      <Badge className="font-medium text-brand-primary bg-white/10 border border-brand-primary/20">
                         {filteredQuestions.length} question{filteredQuestions.length !== 1 ? "s" : ""}
                       </Badge>
                     )}
@@ -127,13 +121,12 @@ export default function Aptitude() {
                           <Button
                             key={sub}
                             variant={selectedSub === sub ? "default" : "outline"}
-                            className={`justify-start text-left h-auto py-3 px-4 rounded-lg font-medium transition-all duration-200`}
-                            onClick={() => setSelectedSub(sub)}
-                            style={
+                            className={`justify-start text-left h-auto py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
                               selectedSub === sub
-                                ? { background: GRADIENT, color: "white", boxShadow: "0 6px 18px rgba(3,4,94,0.08)" }
-                                : { borderColor: `${PRIMARY}33` }
-                            }
+                                ? "bg-gradient-to-r from-brand-primary to-brand-secondary text-white shadow-lg"
+                                : "border border-brand-primary/20"
+                            }`}
+                            onClick={() => setSelectedSub(sub)}
                           >
                             <span className="truncate text-sm">{sub}</span>
                           </Button>
@@ -149,7 +142,7 @@ export default function Aptitude() {
           {/* Desktop: Enhanced LEFT Categories */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="hidden lg:block">
             <Card className="lg:sticky lg:top-6 overflow-hidden shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader style={{ background: GRADIENT, color: "white" }}>
+              <CardHeader className="bg-gradient-to-r from-brand-primary to-brand-secondary text-white">
                 <CardTitle className="text-xl font-semibold">Categories</CardTitle>
               </CardHeader>
               <ScrollArea className="h-[75vh]">
@@ -159,12 +152,11 @@ export default function Aptitude() {
                       <Button
                         key={cat}
                         onClick={() => handleSelectCategory(cat)}
-                        className={`justify-start py-4 px-4 text-left rounded-lg font-medium transition-all duration-200`}
-                        style={
+                        className={`justify-start py-4 px-4 text-left rounded-lg font-medium transition-all duration-200 ${
                           selectedCategory === cat
-                            ? { background: GRADIENT, color: "white", boxShadow: "0 8px 22px rgba(3,4,94,0.08)" }
-                            : { borderColor: `${PRIMARY}33` }
-                        }
+                            ? "bg-gradient-to-r from-brand-primary to-brand-secondary text-white shadow-xl"
+                            : "border border-brand-primary/20"
+                        }`}
                       >
                         {cat}
                       </Button>
@@ -185,7 +177,7 @@ export default function Aptitude() {
                       <span className="hidden sm:inline text-gray-500">
                         {selectedCategory} <span className="text-gray-400 mx-2">/</span>
                       </span>
-                      <span style={{ background: GRADIENT, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+                      <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-primary to-brand-secondary">
                         {selectedSub}
                       </span>
                     </>
@@ -197,7 +189,7 @@ export default function Aptitude() {
                   )}
                 </CardTitle>
                 {selectedSub && (
-                  <Badge style={{ background: `${PRIMARY}14`, color: PRIMARY, border: `1px solid ${PRIMARY}22` }} className="hidden sm:inline-flex">
+                  <Badge className="hidden sm:inline-flex font-medium text-brand-primary bg-white/10 border border-brand-primary/20">
                     {filteredQuestions.length} question{filteredQuestions.length !== 1 ? "s" : ""} available
                   </Badge>
                 )}
@@ -207,7 +199,7 @@ export default function Aptitude() {
                 <CardContent className="p-0">
                   {isLoading ? (
                     <div className="p-6 sm:p-8 text-center">
-                      <div className="animate-spin w-8 h-8 border-4" style={{ borderColor: PRIMARY, borderTopColor: "transparent", borderRadius: "9999px", margin: "0 auto 1rem" }} />
+                      <div className="animate-spin w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full mx-auto mb-4" />
                       <p className="text-gray-500">Loading questions...</p>
                     </div>
                   ) : isError ? (
@@ -238,7 +230,7 @@ export default function Aptitude() {
                     <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
                       {filteredQuestions.map((q, idx) => (
                         <motion.div key={q._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
-                          <QuestionCard question={q} primary={PRIMARY} secondary={SECONDARY} />
+                          <QuestionCard question={q} />
                         </motion.div>
                       ))}
                     </div>
@@ -251,14 +243,14 @@ export default function Aptitude() {
           {/* Desktop: Enhanced RIGHT Subcategories (Non-collapsible) */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="hidden lg:block">
             <Card className="lg:sticky lg:top-6 overflow-hidden shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader style={{ background: GRADIENT, color: "white" }}>
+              <CardHeader className="bg-gradient-to-r from-brand-primary to-brand-secondary text-white">
                 <CardTitle className="text-xl font-semibold">Subcategories</CardTitle>
               </CardHeader>
               <ScrollArea className="h-[75vh]">
                 <CardContent className="pt-6">
                   {isLoading ? (
                     <div className="text-center py-4">
-                      <div className="animate-spin w-6 h-6" style={{ border: `2px solid ${PRIMARY}`, borderTopColor: "transparent", borderRadius: 9999, margin: "0 auto 0.5rem" }} />
+                      <div className="animate-spin w-6 h-6 border-2 border-brand-primary border-t-transparent rounded-full mx-auto mb-2" />
                       <p className="text-sm text-gray-500">Loading...</p>
                     </div>
                   ) : subCategories.length === 0 ? (
@@ -274,13 +266,12 @@ export default function Aptitude() {
                             {items.map((sub) => (
                               <Button
                                 key={sub}
-                                className={`w-full justify-start text-left py-3 px-4 rounded-lg font-medium transition-all duration-200`}
-                                onClick={() => setSelectedSub(sub)}
-                                style={
+                                className={`w-full justify-start text-left py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
                                   selectedSub === sub
-                                    ? { background: GRADIENT, color: "white", boxShadow: "0 6px 18px rgba(3,4,94,0.08)" }
-                                    : { borderColor: `${PRIMARY}22` }
-                                }
+                                    ? "bg-gradient-to-r from-brand-primary to-brand-secondary text-white shadow-lg"
+                                    : "border border-brand-primary/20"
+                                }`}
+                                onClick={() => setSelectedSub(sub)}
                               >
                                 <span className="truncate text-sm">{sub}</span>
                               </Button>
@@ -317,7 +308,7 @@ function groupByFirstLetter(list) {
     }));
 }
 
-function QuestionCard({ question, mode = "practice", primary = "#3DBFD9", secondary = "#03045e" }) {
+function QuestionCard({ question, mode = "practice" }) {
   const [choice, setChoice] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
@@ -362,14 +353,11 @@ function QuestionCard({ question, mode = "practice", primary = "#3DBFD9", second
       const isCorrect = !!(data?.isCorrect || data?.submission?.isCorrect);
       setServerCorrect(isCorrect);
 
-      // optional: show streak to user / update cache if data.streak exists
       if (data?.streak) {
-        // Replace this with your toast or UI update as needed
         console.info("New streak:", data.streak);
       }
     } catch (err) {
       console.error("Submission error", err);
-      // network/server error -> allow retry
       setSubmitted(false);
       setServerCorrect(null);
       alert(err?.message || "Submission failed. See console for details.");
@@ -395,14 +383,14 @@ function QuestionCard({ question, mode = "practice", primary = "#3DBFD9", second
         <CardTitle className="text-base sm:text-lg leading-relaxed text-gray-800">
           {question.statement}
           <div className="mt-4 flex flex-wrap gap-2">
-            <Badge style={{ background: `${primary}10`, color: primary, border: `1px solid ${primary}20` }} className="font-medium">
+            <Badge className="font-medium text-[var(--brand-primary)] bg-white/10 border border-[var(--brand-primary)]/20">
               {question.category}
             </Badge>
-            <Badge style={{ background: `${secondary}10`, color: secondary, border: `1px solid ${secondary}20` }} className="font-medium">
+            <Badge className="font-medium text-[var(--brand-secondary)] bg-white/10 border border-[var(--brand-secondary)]/20">
               {question.subCategory}
             </Badge>
             {question.expectedTime && (
-              <Badge style={{ background: `#fff6ea`, color: `#b45309`, border: `1px solid #fde3b9` }} className="font-medium">
+              <Badge className="font-medium bg-[#fff6ea] text-[#b45309] border border-[#fde3b9]">
                 ⏱️ {question.expectedTime}s
               </Badge>
             )}
@@ -416,20 +404,18 @@ function QuestionCard({ question, mode = "practice", primary = "#3DBFD9", second
             const isSelected = choice === key;
             const isCorrectLocal = key === question.answer;
 
-            let labelClasses = "cursor-pointer text-sm sm:text-base leading-relaxed block w-full rounded-xl px-4 py-3 transition-all duration-200 border-2";
+            let labelClasses =
+              "cursor-pointer text-sm sm:text-base leading-relaxed block w-full rounded-xl px-4 py-3 transition-all duration-200 border-2";
             let containerExtra = "flex items-start space-x-3";
 
-            // Visual rules using serverCorrect if available:
             if (submitted && serverCorrect !== null) {
               if (serverCorrect) {
-                // server said correct → highlight selected correct option (green)
                 if (isSelected && isCorrectLocal) {
                   labelClasses += " bg-green-50 border-green-300 text-green-800 shadow-md";
                 } else {
                   labelClasses += " bg-gray-50 border-gray-200 text-gray-600";
                 }
               } else {
-                // server said incorrect → highlight selected option red (do NOT reveal correct)
                 if (isSelected) {
                   labelClasses += " bg-red-50 border-red-300 text-red-800 shadow-md";
                 } else {
@@ -437,18 +423,15 @@ function QuestionCard({ question, mode = "practice", primary = "#3DBFD9", second
                 }
               }
             } else if (submitted && serverCorrect === null) {
-              // waiting for server
               if (isSelected) {
                 labelClasses += " bg-gray-50 border-gray-200 text-gray-700";
               } else {
                 labelClasses += " bg-white border-gray-200 text-gray-600";
               }
             } else {
-              // not submitted yet
-              labelClasses += ` bg-white border-gray-200 hover:shadow-md`;
+              labelClasses += " bg-white border-gray-200 hover:shadow-md";
             }
 
-            // When user explicitly checks solution, reveal correct option green
             if (showSolution && isCorrectLocal) {
               labelClasses =
                 "cursor-pointer text-sm sm:text-base leading-relaxed block w-full rounded-xl px-4 py-3 transition-all duration-200 border-2 bg-green-50 border-green-300 text-green-800 shadow-md";
@@ -458,7 +441,7 @@ function QuestionCard({ question, mode = "practice", primary = "#3DBFD9", second
               <div key={key} className={containerExtra}>
                 <RadioGroupItem id={`${question._id}-${key}`} value={key} className="mt-1 shrink-0" disabled={submitted || submitting} />
                 <Label htmlFor={`${question._id}-${key}`} className={labelClasses}>
-                  <span className="font-semibold" style={{ color: PRIMARY, marginRight: 12 }}>{key}.</span>
+                  <span className="font-semibold text-brand-primary mr-3">{key}.</span>
                   <span>{value}</span>
                 </Label>
               </div>
@@ -469,19 +452,28 @@ function QuestionCard({ question, mode = "practice", primary = "#3DBFD9", second
         <div className="mt-6 flex flex-wrap gap-3 items-center">
           {!submitted ? (
             <Button
-              className="rounded-xl px-6 py-2.5 transition-all duration-200 shadow-lg"
+              className="rounded-xl px-6 py-2.5 transition-all duration-200 shadow-lg bg-gradient-to-r from-brand-primary to-brand-secondary text-white"
               onClick={handleSubmit}
               disabled={!choice || submitting}
-              style={{ background: GRADIENT, color: "white" }}
             >
               {submitting ? "Submitting…" : "Submit Answer"}
             </Button>
           ) : (
             <>
-              <Button variant="outline" className="rounded-xl px-6 py-2.5 border-2 hover:bg-gray-50 transition-all duration-200" onClick={handleCheckSolution} disabled={showSolution}>
+              <Button
+                variant="outline"
+                className="rounded-xl px-6 py-2.5 border-2 hover:bg-gray-50 transition-all duration-200"
+                onClick={handleCheckSolution}
+                disabled={showSolution}
+              >
                 {showSolution ? "Solution Shown" : "Check Solution"}
               </Button>
-              <Button variant="ghost" className="rounded-xl px-6 py-2.5 text-gray-600 hover:bg-gray-100 transition-all duration-200" onClick={handleResubmit} disabled={submitting}>
+              <Button
+                variant="ghost"
+                className="rounded-xl px-6 py-2.5 text-gray-600 hover:bg-gray-100 transition-all duration-200"
+                onClick={handleResubmit}
+                disabled={submitting}
+              >
                 Try Again
               </Button>
             </>
@@ -501,11 +493,16 @@ function QuestionCard({ question, mode = "practice", primary = "#3DBFD9", second
         </div>
 
         {showSolution && question.solution && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} transition={{ duration: 0.3 }} className="mt-4 p-4 rounded-xl border-2" style={{ background: "#f0fbff", borderColor: `${PRIMARY}22` }}>
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            transition={{ duration: 0.3 }}
+            className="mt-4 p-4 rounded-xl border bg-[#f0fbff] border-brand-primary/20"
+          >
             <div className="text-sm sm:text-base text-gray-700">
               <div className="font-semibold text-indigo-800 mb-2 flex items-center gap-2">
                 💡 Solution:
-                <Badge style={{ background: `${PRIMARY}14`, color: PRIMARY, border: `1px solid ${PRIMARY}22` }}>
+                <Badge className="font-medium text-brand-primary bg-white/10 border border-brand-primary/20">
                   Answer: {question.answer}
                 </Badge>
               </div>
