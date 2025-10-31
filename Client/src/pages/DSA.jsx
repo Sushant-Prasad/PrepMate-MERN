@@ -109,7 +109,7 @@ export default function DSA() {
     };
   }, [questions]);
 
-  // MAIN container height: subtract header (approx 92px). Adjust if your header height differs.
+  // MAIN container height: subtract header (approx 92px). 
   const mainHeightStyle = { height: "calc(100vh - 92px)" };
 
   return (
