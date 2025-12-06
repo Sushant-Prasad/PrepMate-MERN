@@ -21,7 +21,7 @@ function Home() {
       description:
         "Master algorithms with 500+ curated problems. Real-time code execution with Judge0 integration.",
       stats: "500+ Problems",
-      // use brand-secondary → brand-primary
+     
       color: "from-[var(--brand-secondary)] to-[var(--brand-primary)]",
     },
     {
@@ -30,7 +30,6 @@ function Home() {
       description:
         "Ace quantitative & logical reasoning with adaptive difficulty and detailed explanations.",
       stats: "1000+ Questions",
-      // slightly lighter variant in same family
       color: "from-[var(--brand-primary)] to-[#6EDBF0]",
     },
     {
