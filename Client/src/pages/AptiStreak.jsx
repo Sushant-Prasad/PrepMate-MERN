@@ -28,7 +28,6 @@ export default function AptiStreak() {
   const [serverMessage, setServerMessage] = useState(null);
   const [streakInfo, setStreakInfo] = useState(null);
 
-  // NEW: control streak pop-up visibility
   const [showStreakCard, setShowStreakCard] = useState(false);
 
   const { data, isLoading, isError, refetch } = useQuery({
