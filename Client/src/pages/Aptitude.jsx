@@ -1,4 +1,3 @@
-// src/pages/Aptitude.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useAptiQuestions } from "@/services/aptitudeServices";
 import { submitAptitudeAnswer } from "@/services/aptitudeSubmitServices";
