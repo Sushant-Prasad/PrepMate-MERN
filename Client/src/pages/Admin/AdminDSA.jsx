@@ -14,6 +14,25 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import toast from "react-hot-toast";
+import {
+  Code2,
+  Search,
+  RefreshCw,
+  Plus,
+  Edit,
+  Trash2,
+  X,
+  Tag,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  Terminal,
+  Eye,
+  Zap,
+  Database,
+  FileCode,
+} from "lucide-react";
 
 export default function AdminDSA() {
   const navigate = useNavigate();
@@ -24,7 +43,7 @@ export default function AdminDSA() {
 
   // local ui state
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState(null); // selected question for edit
+  const [selected, setSelected] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,7 +66,7 @@ export default function AdminDSA() {
   // mutations
   const createMutation = useCreateDSA({
     onSuccess: () => {
-      toast.success("Question created");
+      toast.success("Question created successfully!");
       refetch();
       closeModal();
     },
@@ -58,7 +77,7 @@ export default function AdminDSA() {
 
   const updateMutation = useUpdateDSA({
     onSuccess: () => {
-      toast.success("Question updated");
+      toast.success("Question updated successfully!");
       refetch();
       closeModal();
     },
@@ -69,7 +88,7 @@ export default function AdminDSA() {
 
   const deleteMutation = useDeleteDSA({
     onSuccess: () => {
-      toast.success("Question deleted");
+      toast.success("Question deleted successfully!");
       refetch();
     },
     onError: (err) => {
@@ -124,7 +143,7 @@ export default function AdminDSA() {
     setModalOpen(true);
   }
 
-  // open modal for edit 
+  // open modal for edit
   function openEditModal(item) {
     setSelected(item);
     setTitle(item.title ?? "");
@@ -220,7 +239,6 @@ export default function AdminDSA() {
         await createMutation.mutateAsync(payload);
       }
     } catch (err) {
-      // onError handles notifications
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -237,81 +255,223 @@ export default function AdminDSA() {
     deleteMutation.mutate(id);
   }
 
+  const getDifficultyColor = (diff) => {
+    switch (diff?.toLowerCase()) {
+      case "easy":
+        return "bg-emerald-100 text-emerald-700 border-emerald-200";
+      case "medium":
+        return "bg-amber-100 text-amber-700 border-amber-200";
+      case "hard":
+        return "bg-red-100 text-red-700 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading DSA questions…</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/40 flex items-center justify-center">
+        <div className="text-center">
+          <Code2 className="w-12 h-12 text-emerald-600 animate-pulse mx-auto mb-4" />
+          <div className="text-gray-600 font-medium">Loading DSA questions...</div>
+        </div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">Failed to load questions: {String(error?.message ?? error)}</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/40 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <div className="text-red-600 font-medium">Failed to load: {String(error?.message ?? error)}</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Input placeholder="Search by title or tag…" value={query} onChange={(e) => setQuery(e.target.value)} className="w-64" />
-            <Button onClick={() => refetch()} variant="outline">Refresh</Button>
-            <Button onClick={openCreateModal}>Create Question</Button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/40">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 rounded-2xl">
+                  <Code2 className="w-8 h-8 text-emerald-600" />
+                </div>
+                <div>
+                  <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-[#03045E] via-emerald-600 to-[#3DBFD9] bg-clip-text text-transparent">
+                    DSA Questions
+                  </h1>
+                  <p className="text-sm sm:text-base text-gray-600">
+                    Manage data structures and algorithms challenges
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="h-1 bg-gradient-to-r from-[#03045E] via-emerald-500 to-[#3DBFD9] rounded-full" />
+        </div>
+
+        {/* Actions Bar */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Input
+              placeholder="Search by title or tags..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="pl-10 h-11 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
+            />
+          </div>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => refetch()}
+              variant="outline"
+              className="border-emerald-500 text-[#03045E] hover:bg-emerald-50 transition-all duration-300"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+            <Button
+              onClick={openCreateModal}
+              className="bg-gradient-to-r from-emerald-600 to-[#3DBFD9] hover:from-emerald-700 hover:to-[#34aac3] text-white shadow-lg shadow-emerald-500/30 transition-all duration-300"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Question
+            </Button>
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Questions ({(questions || []).length})</CardTitle>
+        {/* Questions Card */}
+        <Card className="border-none shadow-xl bg-white">
+          <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-emerald-50/50 to-transparent pb-4">
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Terminal className="w-6 h-6 text-emerald-600" />
+                <div>
+                  <h3 className="text-xl font-bold text-[#03045E]">All Questions</h3>
+                  <p className="text-sm text-gray-500 font-normal mt-0.5">
+                    Total: {(questions || []).length} questions
+                  </p>
+                </div>
+              </div>
+              <Badge className="bg-emerald-100 text-emerald-700 border-none px-4 py-2">
+                {filtered.length} shown
+              </Badge>
+            </CardTitle>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead className="text-left text-xs text-gray-600 border-b">
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs font-semibold text-gray-600 bg-gray-50 border-b-2 border-gray-200">
                   <tr>
-                    <th className="py-2 px-3">Title</th>
-                    <th className="py-2 px-3">Difficulty</th>
-                    <th className="py-2 px-3">Tags</th>
-                    <th className="py-2 px-3">Limits</th>
-                    <th className="py-2 px-3">Actions</th>
+                    <th className="py-4 px-6">Question</th>
+                    <th className="py-4 px-6">Difficulty</th>
+                    <th className="py-4 px-6">Tags</th>
+                    <th className="py-4 px-6">Limits</th>
+                    <th className="py-4 px-6 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-100">
                   {filtered.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-6 text-center text-gray-500">No questions found.</td>
+                      <td colSpan={5} className="py-16">
+                        <div className="text-center">
+                          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-full mb-4">
+                            <Code2 className="w-10 h-10 text-emerald-400" />
+                          </div>
+                          <p className="text-gray-500 mb-2">No questions found</p>
+                          <p className="text-sm text-gray-400">
+                            {query ? "Try adjusting your search" : "Create your first question to get started"}
+                          </p>
+                        </div>
+                      </td>
                     </tr>
                   ) : (
                     filtered.map((q) => (
-                      <tr key={q._id ?? q.id} className="border-b last:border-b-0">
-                        <td className="py-3 px-3 align-top max-w-md">
-                          <div className="font-medium">{q.title}</div>
-                          <div className="text-xs text-gray-500 mt-1 whitespace-pre-wrap">{(q.description || "").slice(0, 120)}{(q.description||"").length>120?"…":""}</div>
-                        </td>
-                        <td className="py-3 px-3 align-top">
-                          <Badge className="capitalize">{q.difficulty ?? "unknown"}</Badge>
-                        </td>
-                        <td className="py-3 px-3 align-top">
-                          <div className="flex flex-wrap gap-1">
-                            {(q.tags || []).slice(0, 8).map((t, i) => (
-                              <Badge key={i} variant="secondary" className="text-xs">{t}</Badge>
-                            ))}
+                      <tr
+                        key={q._id ?? q.id}
+                        className="group hover:bg-emerald-50/30 transition-colors duration-200"
+                      >
+                        <td className="py-4 px-6 align-top max-w-md">
+                          <div className="font-semibold text-[#03045E] group-hover:text-emerald-600 transition-colors mb-1">
+                            {q.title}
+                          </div>
+                          <div className="text-xs text-gray-600 line-clamp-2">
+                            {(q.description || "").slice(0, 120)}
+                            {(q.description || "").length > 120 ? "..." : ""}
                           </div>
                         </td>
-                        <td className="py-3 px-3 align-top font-mono text-xs">
-                          TL: {q.timeLimit ?? "-"}s<br />
-                          ML: {q.memoryLimit ?? "-"}MB
+                        <td className="py-4 px-6 align-top">
+                          <Badge className={`capitalize ${getDifficultyColor(q.difficulty)}`}>
+                            {q.difficulty ?? "unknown"}
+                          </Badge>
                         </td>
-                        <td className="py-3 px-3 align-top">
-                          <div className="flex items-center gap-2">
-                            <Button size="sm" variant="outline" onClick={() => openEditModal(q)}>Edit</Button>
-                            <Button className ="bg-red-600"size="sm" variant="destructive" onClick={() => handleDelete(q)}>Delete</Button>
-                            <Button size="sm" onClick={() => navigate(`/dsa/submit/${q._id ?? q.id}`)}>Open</Button>
+                        <td className="py-4 px-6 align-top">
+                          <div className="flex flex-wrap gap-1">
+                            {(q.tags || []).slice(0, 3).map((t, i) => (
+                              <Badge
+                                key={i}
+                                variant="secondary"
+                                className="text-xs bg-[#3DBFD9]/10 text-[#3DBFD9] border-[#3DBFD9]/30"
+                              >
+                                {t}
+                              </Badge>
+                            ))}
+                            {(q.tags || []).length > 3 && (
+                              <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600">
+                                +{(q.tags || []).length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 align-top">
+                          <div className="space-y-1 text-xs">
+                            <div className="flex items-center gap-1.5 text-gray-700">
+                              <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                              <span className="font-medium">{q.timeLimit ?? "-"}s</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-gray-700">
+                              <Database className="w-3.5 h-3.5 text-blue-600" />
+                              <span className="font-medium">{q.memoryLimit ?? "-"}MB</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 align-top">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => navigate(`/dsa/submit/${q._id ?? q.id}`)}
+                              className="border-[#3DBFD9] text-[#3DBFD9] hover:bg-[#3DBFD9] hover:text-white transition-all duration-300"
+                            >
+                              <Eye className="w-3 h-3 mr-1" />
+                              View
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openEditModal(q)}
+                              className="border-emerald-500 text-emerald-700 hover:bg-emerald-600 hover:text-white transition-all duration-300"
+                            >
+                              <Edit className="w-3 h-3 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDelete(q)}
+                              className="bg-red-500 hover:bg-red-600 transition-all duration-300"
+                            >
+                              <Trash2 className="w-3 h-3 mr-1" />
+                              Delete
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -325,100 +485,227 @@ export default function AdminDSA() {
       </div>
 
       {/* Modal */}
-      <div
-        aria-hidden={!modalOpen}
-        className={`fixed inset-0 z-50 flex items-center justify-center ${modalOpen ? "" : "pointer-events-none"}`}
-      >
-        <div
-          onClick={closeModal}
-          className={`absolute inset-0 bg-black/40 transition-opacity ${modalOpen ? "opacity-100" : "opacity-0"}`}
-        />
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div
+            onClick={closeModal}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
 
-        <div className={`relative w-full max-w-4xl mx-4 transition-transform ${modalOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
-          <div className="bg-white rounded-xl shadow-xl overflow-hidden border">
-            <div className="flex items-center justify-between px-6 py-4 border-b">
-              <h3 className="text-lg font-semibold">{selected ? "Edit Question" : "Create Question"}</h3>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" onClick={closeModal}>Close</Button>
+          <div className="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-emerald-50 to-blue-50 flex-shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-100 rounded-xl">
+                  <Code2 className="w-6 h-6 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-[#03045E]">
+                    {selected ? "Edit Question" : "Create New Question"}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {selected ? "Update question details" : "Add a new DSA challenge"}
+                  </p>
+                </div>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closeModal}
+                className="rounded-full hover:bg-gray-200"
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
 
-            <form onSubmit={handleSubmit}>
-              <div className="px-6 py-4 space-y-4 max-h-[70vh] overflow-auto">
-                <div>
-                  <Label>Title *</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
-                </div>
-
-                <div>
-                  <Label>Description *</Label>
-                  <textarea className="w-full rounded-md border px-3 py-2 min-h-[120px] text-sm" value={description} onChange={(e) => setDescription(e.target.value)} />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* Modal Body */}
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <div className="px-6 py-6 space-y-6 overflow-y-auto flex-1">
+                
+                {/* Title & Description */}
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <Label>Difficulty</Label>
-                    <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="mt-1 w-full rounded-md border px-2 py-2">
-                      <option value="easy">easy</option>
-                      <option value="medium">medium</option>
-                      <option value="hard">hard</option>
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-2">
+                      Title
+                      <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="mt-2 h-11 focus:border-emerald-500 focus:ring-emerald-500"
+                      placeholder="Enter question title..."
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-2">
+                      Description
+                      <span className="text-red-500">*</span>
+                    </Label>
+                    <textarea
+                      className="w-full mt-2 rounded-lg border border-gray-300 px-4 py-3 min-h-[120px] text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Describe the problem..."
+                    />
+                  </div>
+                </div>
+
+                {/* Difficulty & Limits */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-sm font-semibold text-[#03045E]">Difficulty</Label>
+                    <select
+                      value={difficulty}
+                      onChange={(e) => setDifficulty(e.target.value)}
+                      className="mt-2 w-full h-11 rounded-lg border border-gray-300 px-3 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                    >
+                      <option value="easy">Easy</option>
+                      <option value="medium">Medium</option>
+                      <option value="hard">Hard</option>
                     </select>
                   </div>
 
                   <div>
-                    <Label>Time Limit (s)</Label>
-                    <Input type="number" value={timeLimit} onChange={(e) => setTimeLimit(e.target.value)} />
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-1.5">
+                      <Clock className="w-4 h-4" />
+                      Time Limit (s)
+                    </Label>
+                    <Input
+                      type="number"
+                      value={timeLimit}
+                      onChange={(e) => setTimeLimit(e.target.value)}
+                      className="mt-2 h-11 focus:border-emerald-500 focus:ring-emerald-500"
+                    />
                   </div>
 
                   <div>
-                    <Label>Memory Limit (MB)</Label>
-                    <Input type="number" value={memoryLimit} onChange={(e) => setMemoryLimit(e.target.value)} />
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-1.5">
+                      <Database className="w-4 h-4" />
+                      Memory Limit (MB)
+                    </Label>
+                    <Input
+                      type="number"
+                      value={memoryLimit}
+                      onChange={(e) => setMemoryLimit(e.target.value)}
+                      className="mt-2 h-11 focus:border-emerald-500 focus:ring-emerald-500"
+                    />
                   </div>
                 </div>
 
+                {/* Constraints */}
                 <div>
-                  <Label>Constraints</Label>
-                  <textarea className="w-full mt-1 rounded-md border px-3 py-2 text-sm" value={constraints} onChange={(e) => setConstraints(e.target.value)} />
+                  <Label className="text-sm font-semibold text-[#03045E]">Constraints</Label>
+                  <textarea
+                    className="w-full mt-2 rounded-lg border border-gray-300 px-4 py-3 min-h-[80px] text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
+                    value={constraints}
+                    onChange={(e) => setConstraints(e.target.value)}
+                    placeholder="e.g., 1 <= n <= 10^5"
+                  />
                 </div>
 
+                {/* Input & Output Format */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Input Format *</Label>
-                    <textarea className="w-full mt-1 rounded-md border px-3 py-2 text-sm" value={inputFormat} onChange={(e) => setInputFormat(e.target.value)} />
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-2">
+                      Input Format
+                      <span className="text-red-500">*</span>
+                    </Label>
+                    <textarea
+                      className="w-full mt-2 rounded-lg border border-gray-300 px-4 py-3 min-h-[100px] text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                      value={inputFormat}
+                      onChange={(e) => setInputFormat(e.target.value)}
+                      placeholder="Describe the input format..."
+                    />
                   </div>
                   <div>
-                    <Label>Output Format *</Label>
-                    <textarea className="w-full mt-1 rounded-md border px-3 py-2 text-sm" value={outputFormat} onChange={(e) => setOutputFormat(e.target.value)} />
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-2">
+                      Output Format
+                      <span className="text-red-500">*</span>
+                    </Label>
+                    <textarea
+                      className="w-full mt-2 rounded-lg border border-gray-300 px-4 py-3 min-h-[100px] text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                      value={outputFormat}
+                      onChange={(e) => setOutputFormat(e.target.value)}
+                      placeholder="Describe the expected output..."
+                    />
                   </div>
                 </div>
 
-                {/* Test cases */}
+                {/* Test Cases */}
                 <div>
-                  <div className="flex items-center justify-between">
-                    <Label>Test Cases</Label>
-                    <Button type="button" variant="outline" onClick={addTestCase}>Add Test Case</Button>
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-2">
+                      <Zap className="w-4 h-4" />
+                      Test Cases
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addTestCase}
+                      className="border-emerald-500 text-emerald-700 hover:bg-emerald-50"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Test Case
+                    </Button>
                   </div>
 
-                  <div className="space-y-3 mt-3">
+                  <div className="space-y-3">
                     {testCases.map((tc, i) => (
-                      <div key={i} className="border rounded-md p-3">
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm font-medium">Test Case #{i + 1}</div>
-                          <Button type="button" variant="ghost" onClick={() => removeTestCase(i)}>Remove</Button>
+                      <div
+                        key={i}
+                        className="border border-gray-200 rounded-lg p-4 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-[#3DBFD9] rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                              {i + 1}
+                            </div>
+                            <span className="text-sm font-medium text-gray-700">Test Case #{i + 1}</span>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeTestCase(i)}
+                            className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div>
-                            <Label>Input</Label>
-                            <textarea className="w-full mt-1 rounded-md border px-2 py-1 text-sm font-mono" rows={3} value={tc.input} onChange={(e) => updateTestCase(i, { input: e.target.value })} />
+                            <Label className="text-xs font-medium text-gray-700">Input</Label>
+                            <textarea
+                              className="w-full mt-1.5 rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                              rows={3}
+                              value={tc.input}
+                              onChange={(e) => updateTestCase(i, { input: e.target.value })}
+                              placeholder="Input data..."
+                            />
                           </div>
                           <div>
-                            <Label>Expected Output</Label>
-                            <textarea className="w-full mt-1 rounded-md border px-2 py-1 text-sm font-mono" rows={3} value={tc.output} onChange={(e) => updateTestCase(i, { output: e.target.value })} />
+                            <Label className="text-xs font-medium text-gray-700">Expected Output</Label>
+                            <textarea
+                              className="w-full mt-1.5 rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                              rows={3}
+                              value={tc.output}
+                              onChange={(e) => updateTestCase(i, { output: e.target.value })}
+                              placeholder="Expected output..."
+                            />
                           </div>
                           <div>
-                            <Label>Explanation (optional)</Label>
-                            <textarea className="w-full mt-1 rounded-md border px-2 py-1 text-sm" rows={3} value={tc.explanation} onChange={(e) => updateTestCase(i, { explanation: e.target.value })} />
+                            <Label className="text-xs font-medium text-gray-700">Explanation (optional)</Label>
+                            <textarea
+                              className="w-full mt-1.5 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                              rows={3}
+                              value={tc.explanation}
+                              onChange={(e) => updateTestCase(i, { explanation: e.target.value })}
+                              placeholder="Explanation..."
+                            />
                           </div>
                         </div>
                       </div>
@@ -426,20 +713,39 @@ export default function AdminDSA() {
                   </div>
                 </div>
 
-                {/* Starter code */}
+                {/* Starter Code */}
                 <div>
-                  <div className="flex items-center justify-between">
-                    <Label>Starter Code</Label>
-                    <Button type="button" variant="outline" onClick={addStarter}>Add Starter</Button>
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-2">
+                      <FileCode className="w-4 h-4" />
+                      Starter Code
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addStarter}
+                      className="border-[#3DBFD9] text-[#3DBFD9] hover:bg-[#3DBFD9]/10"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Language
+                    </Button>
                   </div>
 
-                  <div className="space-y-3 mt-3">
+                  <div className="space-y-3">
                     {starterCode.map((st, i) => (
-                      <div key={i} className="border rounded-md p-3">
-                        <div className="flex items-center justify-between">
+                      <div
+                        key={i}
+                        className="border border-gray-200 rounded-lg p-4 hover:border-[#3DBFD9]/30 hover:bg-[#3DBFD9]/5 transition-all"
+                      >
+                        <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <Label className="mb-0">Language</Label>
-                            <select className="rounded-md border px-2 py-1" value={st.language} onChange={(e) => updateStarter(i, { language: e.target.value })}>
+                            <Label className="text-sm font-medium text-gray-700">Language</Label>
+                            <select
+                              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-[#3DBFD9] focus:ring-1 focus:ring-[#3DBFD9]"
+                              value={st.language}
+                              onChange={(e) => updateStarter(i, { language: e.target.value })}
+                            >
                               <option value="javascript">JavaScript</option>
                               <option value="python">Python</option>
                               <option value="cpp">C++</option>
@@ -447,51 +753,136 @@ export default function AdminDSA() {
                             </select>
                           </div>
 
-                          <Button type="button" variant="ghost" onClick={() => removeStarter(i)}>Remove</Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeStarter(i)}
+                            className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
 
-                        <div className="mt-2">
-                          <Label>Code</Label>
-                          <textarea className="w-full mt-1 rounded-md border px-2 py-1 text-sm font-mono" rows={6} value={st.code} onChange={(e) => updateStarter(i, { code: e.target.value })} />
+                        <div>
+                          <Label className="text-xs font-medium text-gray-700">Code</Label>
+                          <textarea
+                            className="w-full mt-1.5 rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:border-[#3DBFD9] focus:ring-2 focus:ring-[#3DBFD9]/20 transition-all bg-gray-50"
+                            rows={6}
+                            value={st.code}
+                            onChange={(e) => updateStarter(i, { code: e.target.value })}
+                            placeholder={`function solution() {\n  // Your code here\n}`}
+                          />
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
+                {/* Solution */}
                 <div>
-                  <Label>Solution *</Label>
-                  <textarea className="w-full mt-1 min-h-[140px] rounded-md border px-3 py-2 text-sm font-mono" value={solution} onChange={(e) => setSolution(e.target.value)} />
+                  <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-2">
+                    Solution
+                    <span className="text-red-500">*</span>
+                  </Label>
+                  <textarea
+                    className="w-full mt-2 min-h-[160px] rounded-lg border border-gray-300 px-4 py-3 text-sm font-mono focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all bg-gray-50"
+                    value={solution}
+                    onChange={(e) => setSolution(e.target.value)}
+                    placeholder="Provide the solution code..."
+                  />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Tags */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label>Tags (comma separated)</Label>
-                    <Input value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-1.5">
+                      <Tag className="w-4 h-4" />
+                      Tags
+                      <span className="text-xs text-gray-500 font-normal">(comma separated)</span>
+                    </Label>
+                    <Input
+                      value={tagsText}
+                      onChange={(e) => setTagsText(e.target.value)}
+                      className="mt-2 h-10 focus:border-emerald-500 focus:ring-emerald-500"
+                      placeholder="array, sorting, greedy"
+                    />
                   </div>
 
                   <div>
-                    <Label>Company Tags (comma separated)</Label>
-                    <Input value={companyTagsText} onChange={(e) => setCompanyTagsText(e.target.value)} />
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-1.5">
+                      <Tag className="w-4 h-4" />
+                      Company Tags
+                      <span className="text-xs text-gray-500 font-normal">(comma separated)</span>
+                    </Label>
+                    <Input
+                      value={companyTagsText}
+                      onChange={(e) => setCompanyTagsText(e.target.value)}
+                      className="mt-2 h-10 focus:border-emerald-500 focus:ring-emerald-500"
+                      placeholder="Google, Amazon, Microsoft"
+                    />
                   </div>
 
                   <div>
-                    <Label>Languages Supported (comma separated)</Label>
-                    <Input value={languagesText} onChange={(e) => setLanguagesText(e.target.value)} />
+                    <Label className="text-sm font-semibold text-[#03045E] flex items-center gap-1.5">
+                      <FileCode className="w-4 h-4" />
+                      Languages Supported
+                      <span className="text-xs text-gray-500 font-normal">(comma separated)</span>
+                    </Label>
+                    <Input
+                      value={languagesText}
+                      onChange={(e) => setLanguagesText(e.target.value)}
+                      className="mt-2 h-10 focus:border-emerald-500 focus:ring-emerald-500"
+                      placeholder="javascript, python, cpp"
+                    />
+                  </div>
+                </div>
+
+                {/* Info Note */}
+                <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-900">
+                    <p className="font-medium mb-1">Required Fields</p>
+                    <p className="text-blue-700">
+                      Fields marked with <span className="text-red-500">*</span> are mandatory. 
+                      Ensure all required information is filled before submitting.
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="px-6 py-4 border-t flex items-center justify-end gap-3">
-                <Button variant="outline" onClick={closeModal} type="button">Cancel</Button>
-                <Button type="submit" disabled={submitting}>
-                  {submitting ? "Saving…" : selected ? "Save Changes" : "Create Question"}
+              {/* Modal Footer */}
+              <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-3 flex-shrink-0">
+                <Button
+                  variant="outline"
+                  onClick={closeModal}
+                  type="button"
+                  className="border-gray-300 hover:bg-gray-100"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={submitting}
+                  className="bg-gradient-to-r from-emerald-600 to-[#3DBFD9] hover:from-emerald-700 hover:to-[#34aac3] text-white shadow-lg shadow-emerald-500/30 transition-all duration-300 min-w-[140px]"
+                >
+                  {submitting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                      {selected ? "Save Changes" : "Create Question"}
+                    </>
+                  )}
                 </Button>
               </div>
             </form>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
