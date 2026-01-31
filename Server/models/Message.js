@@ -13,7 +13,7 @@ const messageSchema = new mongoose.Schema(
     },
     sender: { 
       type: mongoose.Schema.Types.ObjectId, 
-      ref: "User", 
+      ref: "UserProfile", 
       required: true 
     },
     body: { 
@@ -33,7 +33,7 @@ const messageSchema = new mongoose.Schema(
     },
     readBy: [{ 
       type: mongoose.Schema.Types.ObjectId, 
-      ref: "User" 
+      ref: "UserProfile" 
     }],
   },
   { timestamps: true }
