@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const userProfileSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true, },
     name: { type: String, required: true },
     profileImage: { type: String },
 
