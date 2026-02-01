@@ -16,6 +16,7 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
+    "cloudinary": "^2.9.0",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -34,6 +35,7 @@
     "otp-generator": "^4.0.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "socket.io": "^4.8.3",
     "validate": "^5.2.0"
   },
   "devDependencies": {
