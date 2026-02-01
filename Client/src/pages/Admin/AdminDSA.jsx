@@ -445,15 +445,7 @@ export default function AdminDSA() {
                         </td>
                         <td className="py-4 px-6 align-top">
                           <div className="flex items-center justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => navigate(`/dsa/submit/${q._id ?? q.id}`)}
-                              className="border-[#3DBFD9] text-[#3DBFD9] hover:bg-[#3DBFD9] hover:text-white transition-all duration-300"
-                            >
-                              <Eye className="w-3 h-3 mr-1" />
-                              View
-                            </Button>
+                            
                             <Button
                               size="sm"
                               variant="outline"
