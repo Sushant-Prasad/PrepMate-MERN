@@ -12,7 +12,8 @@ import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AppLayout from "./layouts/AppLayout";
 import Aptitude from "./pages/Aptitude";
-import StudyRoom from "./pages/StudyRoom";
+// import StudyRoom from "./pages/StudyRoom";
+import Chat from "./pages/Chat"
 import CompanyPrep from "./pages/CompanyPrep";
 import DSASubmit from "./components/DSASubmit";
 import axios from "axios";
@@ -25,80 +26,61 @@ import AdminUsers from "./pages/Admin/AdminUsers";
 import AdminDSA from "./pages/Admin/AdminDSA";
 import AdminAptitude from "./pages/Admin/AdminAptitude";
 
+
+import { ChatProvider } from "./context/ChatContext";
+
+
+
 const queryClient = new QueryClient();
 
 function Root() {
-  const [user, setUser] = useState(null);
-
-  // Load user from localStorage on mount
-  useEffect(() => {
-    const raw = localStorage.getItem("user");
-    if (raw) {
-      try {
-        setUser(JSON.parse(raw));
-      } catch (err) {
-        console.error("Failed to parse user from localStorage", err);
-      }
-    }
-  }, []);
-
-  // logout handler: clear local state and optionally hit backend logout endpoint
   const handleLogout = async () => {
     try {
-      // optional: notify backend to clear HttpOnly cookie/session
       await axios.post(
         `${import.meta.env.VITE_API_URL || "http://localhost:3001/api"}/users/logout`,
         {},
         { withCredentials: true }
       );
     } catch (err) {
-      // ignore errors but console.log for debugging
-      console.warn(
-        "Logout request failed (proceeding with client-side logout)",
-        err
-      );
+      console.warn("Logout request failed", err);
     } finally {
-      localStorage.removeItem("user");
-      setUser(null);
-      // navigate to login page
-      window.location.href = "/login";
+      localStorage.removeItem("user"); // optional
+      navigate("/login", { replace: true });
     }
   };
 
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster position="top-center" />
-      <BrowserRouter>
-        <Routes>
-          {/* AppLayout wraps the main public/app pages */}
-          <Route element={<AppLayout user={user} onLogout={handleLogout} />}>
-            <Route index element={<Home />} />
-            <Route path="login" element={<Login onLogin={(u) => setUser(u)} />} />
-            <Route path="register" element={<Reg />} />
-            <Route path="dsa" element={<DSA />} />
-            <Route path="dsa/submit/:id" element={<DSASubmit />} />
-            <Route path="aptitude" element={<Aptitude />} />
-            <Route path="company" element={<CompanyPrep />} />
-            <Route path="rooms" element={<StudyRoom />} />
-            <Route path="aptitude-streak" element={<AptiStreak />} />
-            <Route path="dsa-streak" element={<DSAStreak />} />
-            <Route path="profile" element={<Profile />} />
-          </Route>
+      <ChatProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppLayout onLogout={handleLogout} />}>
+              <Route index element={<Home />} />
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Reg />} />
+              <Route path="dsa" element={<DSA />} />
+              <Route path="dsa/submit/:id" element={<DSASubmit />} />
+              <Route path="aptitude" element={<Aptitude />} />
+              <Route path="company" element={<CompanyPrep />} />
+              <Route path="rooms" element={<Chat />} />
+              <Route path="aptitude-streak" element={<AptiStreak />} />
+              <Route path="dsa-streak" element={<DSAStreak />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
 
-          {/* Admin area - separate layout (does not use AppLayout) */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<AdminUsers/>} />
-            <Route path="/admin/dsa-questions" element={<AdminDSA/>} />
-            <Route path="/admin/aptitude-questions" element={<AdminAptitude/>} />
-            
-          </Route>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="dsa-questions" element={<AdminDSA />} />
+              <Route path="aptitude-questions" element={<AdminAptitude />} />
+            </Route>
 
-          {/* 404 fallback */}
-          <Route path="*" element={<Error />} />
-        </Routes>
-      </BrowserRouter>
+            <Route path="*" element={<Error />} />
+          </Routes>
+        </BrowserRouter>
+      </ChatProvider>
     </QueryClientProvider>
   );
 }
