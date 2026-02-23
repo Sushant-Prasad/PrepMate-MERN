@@ -17,7 +17,7 @@ const conversationSchema = new mongoose.Schema(
         participants: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "UserProfile",
+                ref: "User",
                 required: true
             }
         ],
@@ -27,7 +27,7 @@ const conversationSchema = new mongoose.Schema(
         },
         unreadCounts: [
             {
-                user: { type: mongoose.Schema.Types.ObjectId, ref: "UserProfile" },
+                user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
                 count: { type: Number, default: 0 },
             },
         ],
@@ -39,9 +39,13 @@ const conversationSchema = new mongoose.Schema(
             type: Date,
             default: Date.now
         },
+        lastMessage: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Message",
+        },
         admin: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "UserProfile",
+            ref: "User",
         }
     },
     { timestamps: true }
