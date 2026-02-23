@@ -1,8 +1,10 @@
-import express from "express";
-import { getUserProfile } from "../controllers/UserProfileController.js";
+import express, { Router } from "express";
+import { getUserProfile, searchUsers, getMe } from "../controllers/UserProfileController.js";
 import { verifyToken } from "../utils/verifytoken.js";
+import { protect } from "../middleware/jwtAuth.js";
 
 const profileRouter = express.Router();
+export const router = Router();
 
 /**
  * Middleware: allow only self or admin to access a profile
@@ -20,5 +22,9 @@ const verifySelfOrAdmin = (req, res, next) => {
  * @access  Private (self or admin)
  */
 profileRouter.get("/:userId", verifyToken, verifySelfOrAdmin, getUserProfile);
+profileRouter.get("/user/search", protect, searchUsers);
+router.get("/me", protect, getMe);
+
+
 
 export default profileRouter;
