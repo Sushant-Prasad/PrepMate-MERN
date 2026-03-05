@@ -3,7 +3,15 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useUserProfile } from "@/services/profileServices";
 import { format } from "date-fns";
 import axios from "axios";
-import { Calendar, Users, Trophy, Flame, Clock, Target, DoorOpen } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  Trophy,
+  Flame,
+  Clock,
+  Target,
+  DoorOpen,
+} from "lucide-react";
 
 /* Small default avatar SVG used when user has no profileImage */
 function DefaultAvatar({ size = 72 }) {
@@ -43,7 +51,9 @@ function StatCard({ icon: Icon, label, value, color = "blue" }) {
   };
 
   return (
-    <div className={`border-2 rounded-xl p-4 flex flex-col items-center text-center ${colorClasses[color]}`}>
+    <div
+      className={`border-2 rounded-xl p-4 flex flex-col items-center text-center ${colorClasses[color]}`}
+    >
       <Icon className="w-6 h-6 mb-2 opacity-80" />
       <div className="text-2xl font-bold mb-1">{value}</div>
       <div className="text-sm font-medium opacity-90">{label}</div>
@@ -53,14 +63,18 @@ function StatCard({ icon: Icon, label, value, color = "blue" }) {
 
 function ActivityItem({ activity, index }) {
   const solvedAt = activity?.solvedAt ? new Date(activity.solvedAt) : null;
-  const solvedAtText = solvedAt && !Number.isNaN(solvedAt.getTime())
-    ? format(solvedAt, "dd/MM/yyyy HH:mm")
-    : "—";
+  const solvedAtText =
+    solvedAt && !Number.isNaN(solvedAt.getTime())
+      ? format(solvedAt, "dd/MM/yyyy HH:mm")
+      : "—";
 
   const isDSA = activity?.type === "dsa";
-  const typeColor = isDSA ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800";
+  const typeColor = isDSA
+    ? "bg-blue-100 text-blue-800"
+    : "bg-green-100 text-green-800";
 
-  const displayText = activity?.displayText || `Question ID: ${activity?.questionId || "—"}`;
+  const displayText =
+    activity?.displayText || `Question ID: ${activity?.questionId || "—"}`;
 
   return (
     <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
@@ -70,11 +84,16 @@ function ActivityItem({ activity, index }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${typeColor}`}>
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${typeColor}`}
+            >
               {activity?.type ? activity.type.toUpperCase() : "ACTIVITY"}
             </span>
           </div>
-          <div className="text-sm text-gray-700 font-medium truncate mb-1" title={displayText}>
+          <div
+            className="text-sm text-gray-700 font-medium truncate mb-1"
+            title={displayText}
+          >
             {displayText}
           </div>
           <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -97,7 +116,8 @@ export default function Profile() {
     console.warn("Failed to parse user from localStorage", e);
   }
 
-  const userId = currentUser?.id || currentUser?._id || currentUser?.userId || null;
+  const userId =
+    currentUser?.id || currentUser?._id || currentUser?.userId || null;
 
   if (!userId) {
     return (
@@ -106,8 +126,12 @@ export default function Profile() {
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Users className="w-8 h-8 text-red-600" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Required</h2>
-          <p className="text-gray-600 mb-6">You must be logged in to view your profile.</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Authentication Required
+          </h2>
+          <p className="text-gray-600 mb-6">
+            You must be logged in to view your profile.
+          </p>
           <a
             href="/login"
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -146,7 +170,11 @@ export default function Profile() {
     let cancelled = false;
 
     const enrich = async () => {
-      if (!profile || !Array.isArray(profile.recentActivity) || profile.recentActivity.length === 0) {
+      if (
+        !profile ||
+        !Array.isArray(profile.recentActivity) ||
+        profile.recentActivity.length === 0
+      ) {
         setEnrichedRecent([]);
         return;
       }
@@ -164,15 +192,20 @@ export default function Profile() {
 
         try {
           if (act?.type === "dsa") {
-            const res = await api.get(`/dsa-questions/${encodeURIComponent(qId)}`);
+            const res = await api.get(
+              `/dsa-questions/${encodeURIComponent(qId)}`,
+            );
             const q = res?.data?.data ?? res?.data;
             const title = q?.title || q?.question || `Question ID: ${qId}`;
             out.displayText = title;
             out.questionTitle = title;
           } else {
-            const res = await api.get(`/aptitude-questions/${encodeURIComponent(qId)}`);
+            const res = await api.get(
+              `/aptitude-questions/${encodeURIComponent(qId)}`,
+            );
             const q = res?.data?.data ?? res?.data;
-            const statement = q?.statement || q?.question || `Question ID: ${qId}`;
+            const statement =
+              q?.statement || q?.question || `Question ID: ${qId}`;
             out.displayText = statement;
             out.questionStatement = statement;
           }
@@ -189,7 +222,9 @@ export default function Profile() {
         if (!cancelled) {
           const fallback = profile.recentActivity.slice(0, 8).map((act) => ({
             ...act,
-            displayText: act?.type ? `${act.type.toUpperCase()} ID: ${act.questionId || "—"}` : `ID: ${act.questionId || "—"}`,
+            displayText: act?.type
+              ? `${act.type.toUpperCase()} ID: ${act.questionId || "—"}`
+              : `ID: ${act.questionId || "—"}`,
           }));
           setEnrichedRecent(fallback);
         }
@@ -221,8 +256,12 @@ export default function Profile() {
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Target className="w-8 h-8 text-red-600" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Profile</h2>
-          <p className="text-gray-600">{error?.message || "Unknown error occurred"}</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Error Loading Profile
+          </h2>
+          <p className="text-gray-600">
+            {error?.message || "Unknown error occurred"}
+          </p>
         </div>
       </div>
     );
@@ -272,7 +311,11 @@ export default function Profile() {
               <div className="relative">
                 <div className="w-32 h-32 border-4 border-white rounded-2xl overflow-hidden bg-white shadow-lg">
                   {profileImage ? (
-                    <img src={profileImage} alt={`${name}'s avatar`} className="w-full h-full object-cover" />
+                    <img
+                      src={profileImage}
+                      alt={`${name}'s avatar`}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <DefaultAvatar size={120} />
@@ -282,7 +325,9 @@ export default function Profile() {
               </div>
 
               <div className="text-center md:text-left flex-1 mt-4 md:mt-0">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{name}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                  {name}
+                </h1>
                 {/* header joined-rooms line intentionally removed — joined rooms moved below progress */}
               </div>
             </div>
@@ -305,13 +350,27 @@ export default function Profile() {
                   DSA Performance
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <StatCard icon={Flame} label="Current Streak" value={dsaStreak?.currentStreak ?? 0} color="blue" />
-                  <StatCard icon={Trophy} label="Best Streak" value={dsaStreak?.bestStreak ?? 0} color="purple" />
+                  <StatCard
+                    icon={Flame}
+                    label="Current Streak"
+                    value={dsaStreak?.currentStreak ?? 0}
+                    color="blue"
+                  />
+                  <StatCard
+                    icon={Trophy}
+                    label="Best Streak"
+                    value={dsaStreak?.bestStreak ?? 0}
+                    color="purple"
+                  />
                   <div className="col-span-2 md:col-span-1">
                     <div className="border-2 border-gray-200 bg-gray-50 text-gray-700 rounded-xl p-4 flex flex-col items-center text-center h-full">
                       <Calendar className="w-6 h-6 mb-2 opacity-80" />
-                      <div className="text-lg font-bold mb-1">{lastDSADate}</div>
-                      <div className="text-sm font-medium opacity-90">Last Solved</div>
+                      <div className="text-lg font-bold mb-1">
+                        {lastDSADate}
+                      </div>
+                      <div className="text-sm font-medium opacity-90">
+                        Last Solved
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -324,13 +383,27 @@ export default function Profile() {
                   Aptitude Performance
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <StatCard icon={Flame} label="Current Streak" value={aptitudeStreak?.currentStreak ?? 0} color="green" />
-                  <StatCard icon={Trophy} label="Best Streak" value={aptitudeStreak?.bestStreak ?? 0} color="orange" />
+                  <StatCard
+                    icon={Flame}
+                    label="Current Streak"
+                    value={aptitudeStreak?.currentStreak ?? 0}
+                    color="green"
+                  />
+                  <StatCard
+                    icon={Trophy}
+                    label="Best Streak"
+                    value={aptitudeStreak?.bestStreak ?? 0}
+                    color="orange"
+                  />
                   <div className="col-span-2 md:col-span-1">
                     <div className="border-2 border-gray-200 bg-gray-50 text-gray-700 rounded-xl p-4 flex flex-col items-center text-center h-full">
                       <Calendar className="w-6 h-6 mb-2 opacity-80" />
-                      <div className="text-lg font-bold mb-1">{lastAptDate}</div>
-                      <div className="text-sm font-medium opacity-90">Last Solved</div>
+                      <div className="text-lg font-bold mb-1">
+                        {lastAptDate}
+                      </div>
+                      <div className="text-sm font-medium opacity-90">
+                        Last Solved
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -344,59 +417,56 @@ export default function Profile() {
                   <DoorOpen className="w-5 h-5 text-indigo-500" />
                   Joined Groups
                 </h3>
-                <a href="/rooms" className="text-sm text-blue-600 hover:underline">Manage</a>
+                <a
+                  href="/rooms"
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Manage
+                </a>
               </div>
 
               {Array.isArray(joinedGroups) && joinedGroups.length > 0 ? (
-  <ul className="space-y-2">
-    {joinedGroups.map((group) => (
-      <li
-        key={group._id}
-        className="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-md p-3"
-      >
-        <div className="flex items-center gap-3 min-w-0">
+                <ul className="space-y-2">
+                  {joinedGroups.map((group) => (
+                    <li
+                      key={group._id}
+                      className="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-md p-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Group Avatar */}
+                        <div className="w-8 h-8 bg-white rounded-md flex items-center justify-center border text-gray-600 overflow-hidden">
+                          {group.groupImage ? (
+                            <img
+                              src={group.groupImage}
+                              alt={group.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            group.name?.[0]?.toUpperCase()
+                          )}
+                        </div>
 
-          {/* Group Avatar */}
-          <div className="w-8 h-8 bg-white rounded-md flex items-center justify-center border text-gray-600 overflow-hidden">
-            {group.groupImage ? (
-              <img
-                src={group.groupImage}
-                alt={group.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              group.name?.[0]?.toUpperCase()
-            )}
-          </div>
+                        {/* Group Info */}
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-gray-900 truncate">
+                            {group.name}
+                          </div>
 
-          {/* Group Info */}
-          <div className="min-w-0">
-            <div className="text-sm font-medium text-gray-900 truncate">
-              {group.name}
-            </div>
-
-            <div className="text-xs text-gray-500">
-              {group.members} members
-            </div>
-          </div>
-        </div>
-
-        <a
-          href={`/rooms/`}
-          className="text-xs text-blue-600 hover:underline"
-        >
-          Open
-        </a>
-      </li>
-    ))}
-  </ul>
-) : (
-  <div className="text-center py-8">
-    <div className="text-gray-500 mb-3">
-      You haven't joined any groups yet.
-    </div>
-  </div>
-)}
+                          <div className="text-xs text-gray-500">
+                            {group.members} members
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="text-gray-500 mb-3">
+                    You haven't joined any groups yet.
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -414,12 +484,18 @@ export default function Profile() {
                     <Target className="w-8 h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-500 text-sm">No recent activity</p>
-                  <p className="text-gray-400 text-xs mt-1">Start solving questions to see your progress here</p>
+                  <p className="text-gray-400 text-xs mt-1">
+                    Start solving questions to see your progress here
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {recent.map((activity, index) => (
-                    <ActivityItem key={index} activity={activity} index={index} />
+                    <ActivityItem
+                      key={index}
+                      activity={activity}
+                      index={index}
+                    />
                   ))}
                 </div>
               )}
