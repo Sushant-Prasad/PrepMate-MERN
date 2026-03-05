@@ -108,7 +108,7 @@ io.use(async (socket, next) => {
 io.on("connection", async (socket) => {
   console.log("⚡ Connected:", socket.user.email);
 
-  const joinedRooms = new Set();
+  const joinedGroups= new Set();
 
   try {
     const userConversations = await Conversation.find({
@@ -117,16 +117,16 @@ io.on("connection", async (socket) => {
 
     userConversations.forEach((conv) => {
       socket.join(conv._id.toString());
-      joinedRooms.add(conv._id.toString());
+      joinedGroups.add(conv._id.toString());
     });
   } catch (err) {
     console.error("Auto join error:", err);
   }
 
   socket.on("join_conversation", (conversationId) => {
-    if (!conversationId || joinedRooms.has(conversationId)) return;
+    if (!conversationId || joinedGroups.has(conversationId)) return;
     socket.join(conversationId);
-    joinedRooms.add(conversationId);
+    joinedGroups.add(conversationId);
   });
 
   socket.on("send_message", async ({ conversationId, content }) => {

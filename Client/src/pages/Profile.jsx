@@ -244,7 +244,7 @@ export default function Profile() {
     dsaStreak = { currentStreak: 0, bestStreak: 0, lastSolvedDate: null },
     aptitudeStreak = { currentStreak: 0, bestStreak: 0, lastSolvedDate: null },
     recentActivity = [],
-    joinedRooms = [],
+    joinedGroups = [],
   } = profile;
 
   const lastDSADate =
@@ -342,36 +342,61 @@ export default function Profile() {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   <DoorOpen className="w-5 h-5 text-indigo-500" />
-                  Joined Rooms
+                  Joined Groups
                 </h3>
                 <a href="/rooms" className="text-sm text-blue-600 hover:underline">Manage</a>
               </div>
 
-              {Array.isArray(joinedRooms) && joinedRooms.length > 0 ? (
-                <ul className="space-y-2">
-                  {joinedRooms.map((room, i) => (
-                    <li key={i} className="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-md p-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 bg-white rounded-md flex items-center justify-center border text-gray-600">
-                          {room?.[0]?.toUpperCase() || "R"}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium text-gray-900 truncate">{room}</div>
-                          <div className="text-xs text-gray-500">Member</div>
-                        </div>
-                      </div>
-                      <a href="/rooms" className="text-xs text-blue-600 hover:underline">Open</a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="text-center py-8">
-                  <div className="text-gray-500 mb-3">You haven't joined any rooms yet.</div>
-                  <a href="/rooms" className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">
-                    Browse Rooms
-                  </a>
-                </div>
-              )}
+              {Array.isArray(joinedGroups) && joinedGroups.length > 0 ? (
+  <ul className="space-y-2">
+    {joinedGroups.map((group) => (
+      <li
+        key={group._id}
+        className="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-md p-3"
+      >
+        <div className="flex items-center gap-3 min-w-0">
+
+          {/* Group Avatar */}
+          <div className="w-8 h-8 bg-white rounded-md flex items-center justify-center border text-gray-600 overflow-hidden">
+            {group.groupImage ? (
+              <img
+                src={group.groupImage}
+                alt={group.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              group.name?.[0]?.toUpperCase()
+            )}
+          </div>
+
+          {/* Group Info */}
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-gray-900 truncate">
+              {group.name}
+            </div>
+
+            <div className="text-xs text-gray-500">
+              {group.members} members
+            </div>
+          </div>
+        </div>
+
+        <a
+          href={`/rooms/`}
+          className="text-xs text-blue-600 hover:underline"
+        >
+          Open
+        </a>
+      </li>
+    ))}
+  </ul>
+) : (
+  <div className="text-center py-8">
+    <div className="text-gray-500 mb-3">
+      You haven't joined any groups yet.
+    </div>
+  </div>
+)}
             </div>
           </div>
 

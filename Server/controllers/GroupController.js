@@ -5,6 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import UserProfile from "../models/UserProfile.js";
 
 
 /* CREATE GROUP */
@@ -105,8 +106,15 @@ export const joinGroup = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Already a member");
   }
 
+  // Add user to group
   group.participants.push(req.user._id);
   await group.save();
+
+  // 🔹 Update UserProfile joinedGroups
+  await UserProfile.findOneAndUpdate(
+    { userId: req.user._id },
+    { $addToSet: { joinedGroups: groupId } }
+  );
 
   res.status(200).json(new ApiResponse(200, "Joined group", group));
 });
@@ -128,6 +136,12 @@ export const leaveGroup = asyncHandler(async (req, res) => {
   );
 
   await group.save();
+
+  // 🔹 Remove group from UserProfile
+  await UserProfile.findOneAndUpdate(
+    { userId: req.user._id },
+    { $pull: { joinedGroups: groupId } }
+  );
 
   res.status(200).json(new ApiResponse(200, "Left group", group));
 });

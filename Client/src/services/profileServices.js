@@ -20,7 +20,7 @@ export const profileKeys = {
 
 /**
  * GET /api/profiles/:userId
- * Returns: { success: true, data: { name, profileImage, dsaStreak, aptitudeStreak, recentActivity, joinedRooms } }
+ * Returns: { success: true, data: { name, profileImage, dsaStreak, aptitudeStreak, recentActivity, joinedGroups } }
  */
 export const fetchUserProfile = async (userId) => {
   if (!userId) throw new Error("userId is required");

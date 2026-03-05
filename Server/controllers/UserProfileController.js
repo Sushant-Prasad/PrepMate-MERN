@@ -8,7 +8,6 @@ import Conversation from "../models/Conversation.js";
 
 /**
  * Idempotent + race-safe profile creation.
- * Uses your schema's dsaStreak/aptitudeStreak fields.
  */
 export const createProfileForUser = async (userId) => {
   if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -28,7 +27,6 @@ export const createProfileForUser = async (userId) => {
         dsaStreak: { currentStreak: 0, bestStreak: 0, lastSolvedDate: null },
         aptitudeStreak: { currentStreak: 0, bestStreak: 0, lastSolvedDate: null },
         recentActivity: [],
-        joinedRooms: [],
       },
     },
     { new: true, upsert: true }
@@ -37,9 +35,10 @@ export const createProfileForUser = async (userId) => {
   return profile;
 };
 
+
 /**
  * GET /api/profiles/:userId
- * Returns name, profileImage, dsaStreak, aptitudeStreak, recentActivity, joinedRooms (names only)
+ * Returns user profile with joined groups
  */
 export const getUserProfile = async (req, res) => {
   try {
@@ -63,13 +62,24 @@ export const getUserProfile = async (req, res) => {
       });
     }
 
-    // 🔹 Fetch groups where user is a participant
+    /* ---------------- JOINED GROUPS ---------------- */
+
     const joinedGroups = await Conversation.find({
-      participants: userId,
+      participants: new mongoose.Types.ObjectId(userId),
       isGroup: true,
     })
-      .select("name groupImage")
+      .select("name groupImage participants")
       .lean();
+
+    const groups = joinedGroups.map((g) => ({
+      _id: g._id,
+      name: g.name,
+      groupImage: g.groupImage,
+      members: g.participants.length,
+    }));
+
+
+    /* ---------------- RECENT ACTIVITY ---------------- */
 
     const recent = Array.isArray(profile.recentActivity)
       ? [...profile.recentActivity]
@@ -77,17 +87,23 @@ export const getUserProfile = async (req, res) => {
           .slice(0, 10)
       : [];
 
+
+    /* ---------------- RESPONSE ---------------- */
+
     return res.json({
       success: true,
       data: {
         name: profile.name,
         profileImage: profile.profileImage || "",
-        dsaStreak: profile.dsaStreak,
-        aptitudeStreak: profile.aptitudeStreak,
+        dsaStreak:
+          profile.dsaStreak || { currentStreak: 0, bestStreak: 0 },
+        aptitudeStreak:
+          profile.aptitudeStreak || { currentStreak: 0, bestStreak: 0 },
         recentActivity: recent,
-        joinedGroups,
+        joinedGroups: groups,
       },
     });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -99,15 +115,20 @@ export const getUserProfile = async (req, res) => {
 };
 
 
+/* ------------------ SEARCH USERS ------------------ */
 
-// ------------------ SEARCH USERS ------------------
 export const searchUsers = asyncHandler(async (req, res) => {
   const q = (req.query.q || req.query.query || "").trim();
+
   if (!q) {
-    return res.status(400).json({ message: "Query parameter is required" });
+    return res.status(400).json({
+      success: false,
+      message: "Query parameter is required",
+    });
   }
 
   const regex = new RegExp(q, "i");
+
   const users = await User.find(
     { $or: [{ email: regex }, { name: regex }] },
     "_id name email"
@@ -115,16 +136,20 @@ export const searchUsers = asyncHandler(async (req, res) => {
     .limit(30)
     .lean();
 
-  return res.status(200).json(new ApiResponse(200, "Users found", users));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Users found", users));
 });
 
 
+/* ------------------ GET LOGGED IN USER ------------------ */
 
-// ------------------ PROFILE ------------------
 export const getMe = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
+
   if (!user) throw new ApiError(404, "User not found");
 
-  return res.status(200).json(new ApiResponse(200, "User profile", user));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "User profile", user));
 });
-
