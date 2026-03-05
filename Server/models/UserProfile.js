@@ -29,7 +29,7 @@ const userProfileSchema = new Schema(
       },
     ],
 
-    joinedRooms: [{ type: Schema.Types.ObjectId, ref: "StudyRoom" }],
+    joinedRooms: [{ type: Schema.Types.ObjectId, ref: "Conversation" }],
   },
   { timestamps: true } // adds createdAt & updatedAt automatically
 );

@@ -7,7 +7,7 @@ import {
   sendGroupMessage,
   getMyGroups,
   searchGroups
-} from "../controllers/Group.js";
+} from "../controllers/GroupController.js";
 import { protect } from "../middleware/jwtAuth.js";
 import {upload} from "../middleware/multer.js"; // for media upload
 const router = Router();
