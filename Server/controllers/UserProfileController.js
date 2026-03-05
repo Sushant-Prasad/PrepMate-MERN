@@ -38,10 +38,10 @@ export const createProfileForUser = async (userId) => {
 
 /**
  * GET /api/profiles/:userId
- * Returns user profile with joined groups
  */
 export const getUserProfile = async (req, res) => {
   try {
+
     const { userId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -52,8 +52,7 @@ export const getUserProfile = async (req, res) => {
     }
 
     const profile = await UserProfile.findOne({ userId })
-      .select("name profileImage dsaStreak aptitudeStreak recentActivity")
-      .lean();
+      .select("name profileImage dsaStreak aptitudeStreak recentActivity");
 
     if (!profile) {
       return res.status(404).json({
@@ -62,10 +61,45 @@ export const getUserProfile = async (req, res) => {
       });
     }
 
+
+    /* ---------------- STREAK VALIDATION ---------------- */
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    // Aptitude streak check
+    if (profile.aptitudeStreak?.lastSolvedDate) {
+
+      const last = new Date(profile.aptitudeStreak.lastSolvedDate);
+      last.setHours(0,0,0,0);
+
+      const diffDays = Math.floor((today - last) / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 1 && profile.aptitudeStreak.currentStreak !== 0) {
+        profile.aptitudeStreak.currentStreak = 0;
+        await profile.save();
+      }
+    }
+
+    // DSA streak check
+    if (profile.dsaStreak?.lastSolvedDate) {
+
+      const last = new Date(profile.dsaStreak.lastSolvedDate);
+      last.setHours(0,0,0,0);
+
+      const diffDays = Math.floor((today - last) / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 1 && profile.dsaStreak.currentStreak !== 0) {
+        profile.dsaStreak.currentStreak = 0;
+        await profile.save();
+      }
+    }
+
+
     /* ---------------- JOINED GROUPS ---------------- */
 
     const joinedGroups = await Conversation.find({
-      participants: new mongoose.Types.ObjectId(userId),
+      participants: userId,
       isGroup: true,
     })
       .select("name groupImage participants")
@@ -95,22 +129,23 @@ export const getUserProfile = async (req, res) => {
       data: {
         name: profile.name,
         profileImage: profile.profileImage || "",
-        dsaStreak:
-          profile.dsaStreak || { currentStreak: 0, bestStreak: 0 },
-        aptitudeStreak:
-          profile.aptitudeStreak || { currentStreak: 0, bestStreak: 0 },
+        dsaStreak: profile.dsaStreak || { currentStreak: 0, bestStreak: 0 },
+        aptitudeStreak: profile.aptitudeStreak || { currentStreak: 0, bestStreak: 0 },
         recentActivity: recent,
         joinedGroups: groups,
       },
     });
 
   } catch (error) {
+
     console.error(error);
+
     return res.status(500).json({
       success: false,
       message: "Failed to fetch profile",
       error: error.message,
     });
+
   }
 };
 
@@ -118,6 +153,7 @@ export const getUserProfile = async (req, res) => {
 /* ------------------ SEARCH USERS ------------------ */
 
 export const searchUsers = asyncHandler(async (req, res) => {
+
   const q = (req.query.q || req.query.query || "").trim();
 
   if (!q) {
@@ -145,6 +181,7 @@ export const searchUsers = asyncHandler(async (req, res) => {
 /* ------------------ GET LOGGED IN USER ------------------ */
 
 export const getMe = asyncHandler(async (req, res) => {
+
   const user = await User.findById(req.user._id).select("-password");
 
   if (!user) throw new ApiError(404, "User not found");
@@ -152,4 +189,5 @@ export const getMe = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, "User profile", user));
+
 });
