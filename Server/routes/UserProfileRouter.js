@@ -1,30 +1,80 @@
-import express, { Router } from "express";
-import { getUserProfile, searchUsers, getMe } from "../controllers/UserProfileController.js";
+import express from "express";
+import {
+  getUserProfile,
+  searchUsers,
+  getMe,
+  uploadProfileImage,
+  deleteProfileImage
+} from "../controllers/UserProfileController.js";
+
 import { verifyToken } from "../utils/verifytoken.js";
 import { protect } from "../middleware/jwtAuth.js";
+import upload from "../middleware/multer.js";
 
 const profileRouter = express.Router();
-export const router = Router();
 
-/**
- * Middleware: allow only self or admin to access a profile
- */
+
+/* ---------------- VERIFY SELF OR ADMIN ---------------- */
+
 const verifySelfOrAdmin = (req, res, next) => {
+
   if (req.user.id === req.params.userId || req.user.role === "admin") {
     return next();
   }
-  return res.status(403).json({ success: false, message: "Forbidden" });
+
+  return res.status(403).json({
+    success: false,
+    message: "Forbidden"
+  });
+
 };
 
+
+/* ---------------- PROFILE ROUTES ---------------- */
+
+
 /**
- * @route   GET /api/profiles/:userId
- * @desc    Get user profile by userId
- * @access  Private (self or admin)
+ * GET logged-in user
+ * GET /api/profiles/me
+ */
+profileRouter.get("/me", protect, getMe);
+
+
+/**
+ * SEARCH USERS
+ * GET /api/profiles/search?q=
+ */
+profileRouter.get("/search", protect, searchUsers);
+
+
+/**
+ * GET USER PROFILE
+ * GET /api/profiles/:userId
  */
 profileRouter.get("/:userId", verifyToken, verifySelfOrAdmin, getUserProfile);
-profileRouter.get("/user/search", protect, searchUsers);
-router.get("/me", protect, getMe);
 
+
+/**
+ * UPLOAD PROFILE IMAGE
+ * POST /api/profiles/upload-photo
+ */
+profileRouter.post(
+  "/upload-photo",
+  protect,
+  upload.single("image"),
+  uploadProfileImage
+);
+
+
+/**
+ * DELETE PROFILE IMAGE
+ * DELETE /api/profiles/delete-photo
+ */
+profileRouter.delete(
+  "/delete-photo",
+  protect,
+  deleteProfileImage
+);
 
 
 export default profileRouter;

@@ -30,7 +30,7 @@ import userAptitudeSubmissionRouter from "./routes/UserAptitudeSubmissionRouter.
 import UserDSASubmissionRouter from "./routes/UserDSASubmissionRouter.js";
 import authRouter from "./routes/authRouter.js";
 import profileRouter from "./routes/UserProfileRouter.js";
-import {router} from "./routes/UserProfileRouter.js"
+
 
 dotenv.config();
 
@@ -57,7 +57,6 @@ app.use(
   "/api",
   conversationRouter,
   messageRouter,
-  router,
   // userRouter,
   groupRouter,
   adminRouter
