@@ -1,6 +1,10 @@
 // src/pages/Profile.jsx
 import React, { useMemo, useState, useEffect } from "react";
-import { useUserProfile } from "@/services/profileServices";
+import {
+  useUserProfile,
+  useUploadProfilePhoto,
+  useDeleteProfilePhoto,
+} from "@/services/profileServices";
 import { format } from "date-fns";
 import axios from "axios";
 import {
@@ -11,6 +15,8 @@ import {
   Clock,
   Target,
   DoorOpen,
+  Camera,
+  Trash2,
 } from "lucide-react";
 
 /* Small default avatar SVG used when user has no profileImage */
@@ -147,6 +153,18 @@ export default function Profile() {
   const { data, isLoading, isError, error } = useUserProfile(userId, {
     enabled: !!userId,
   });
+  const { mutate: uploadPhoto, isPending: uploading } = useUploadProfilePhoto();
+  const { mutate: deletePhoto } = useDeleteProfilePhoto();
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    uploadPhoto(file);
+  };
+  const handleDeletePhoto = () => {
+    deletePhoto();
+  };
 
   const profile = useMemo(() => {
     if (!data) return null;
@@ -309,17 +327,41 @@ export default function Profile() {
           <div className="relative px-6 md:px-8 pb-6">
             <div className="flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16">
               <div className="relative">
-                <div className="w-32 h-32 border-4 border-white rounded-2xl overflow-hidden bg-white shadow-lg">
-                  {profileImage ? (
-                    <img
-                      src={profileImage}
-                      alt={`${name}'s avatar`}
-                      className="w-full h-full object-cover"
+                <div className="relative group">
+                  {/* Avatar */}
+                  <div className="w-32 h-32 border-4 border-white rounded-2xl overflow-hidden bg-white shadow-lg">
+                    {profileImage ? (
+                      <img
+                        src={profileImage}
+                        alt={`${name}'s avatar`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <DefaultAvatar size={120} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Upload Icon */}
+                  <label className="absolute bottom-1 right-1 bg-blue-600 p-2 rounded-full text-white cursor-pointer shadow-md opacity-0 group-hover:opacity-100 transition">
+                    <Camera size={16} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      className="hidden"
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <DefaultAvatar size={120} />
-                    </div>
+                  </label>
+
+                  {/* Delete Icon */}
+                  {profileImage && (
+                    <button
+                      onClick={handleDeletePhoto}
+                      className="absolute top-1 right-1 bg-red-500 p-2 rounded-full text-white shadow-md opacity-0 group-hover:opacity-100 transition"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   )}
                 </div>
               </div>

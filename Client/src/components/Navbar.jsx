@@ -7,7 +7,7 @@ import { FaFireAlt } from "react-icons/fa";
 import { IoFlash } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
 import { useUserProfile } from "@/services/profileServices";
-import logoSrc from "@/assets/FullLogo.jpg"; 
+import logoSrc from "@/assets/FullLogo.jpg";
 
 function Navbar({ user = null, onLogout = () => {} }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,10 +22,14 @@ function Navbar({ user = null, onLogout = () => {} }) {
   } catch (e) {
     // ignore parse errors
   }
-  const userId = storedUser?.id ?? storedUser?._id ?? storedUser?.userId ?? null;
+  const userId =
+    storedUser?.id ?? storedUser?._id ?? storedUser?.userId ?? null;
 
   // useUserProfile will be disabled when there's no userId
-  const { data: profileResp, isLoading: profileLoading } = useUserProfile(userId, { enabled: !!userId });
+  const { data: profileResp, isLoading: profileLoading } = useUserProfile(
+    userId,
+    { enabled: !!userId },
+  );
 
   // normalize profile object (your fetcher sometimes returns { success, data })
   const profile = profileResp?.data ?? profileResp ?? null;
@@ -42,8 +46,12 @@ function Navbar({ user = null, onLogout = () => {} }) {
   };
 
   // Use profile dsa/aptitude streaks if available; fall back to 0
-  const dsaStreak = safeNumber(profile?.dsaStreak ?? profile?.streaks?.dsa ?? null);
-  const aptitudeStreak = safeNumber(profile?.aptitudeStreak ?? profile?.streaks?.aptitude ?? null);
+  const dsaStreak = safeNumber(
+    profile?.dsaStreak ?? profile?.streaks?.dsa ?? null,
+  );
+  const aptitudeStreak = safeNumber(
+    profile?.aptitudeStreak ?? profile?.streaks?.aptitude ?? null,
+  );
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -73,28 +81,19 @@ function Navbar({ user = null, onLogout = () => {} }) {
           aria-label="PrepMate home"
         >
           {/* logo image */}
-          <div
-            className="flex items-center justify-center  "
-            
-          >
-            <img
-              src={logoSrc}
-              alt="PrepMate logo"
-              className="w-12 h-12 p-0"
-             
-            />
+          <div className="flex items-center justify-center  ">
+            <img src={logoSrc} alt="PrepMate logo" className="w-12 h-12 p-0" />
           </div>
 
           {/* brand text */}
           <div className="leading-tight">
             <div className="text-2xl font-bold tracking-tight text-[#3DBFD9]">
               <span className="text-2xl font-bold tracking-tight text-[#3DBFD9]">
-              Prep
+                Prep
               </span>
-             <span className="text-2xl font-bold tracking-tight text-[#03045e]">
-             Mate
-             </span>
-              
+              <span className="text-2xl font-bold tracking-tight text-[#03045e]">
+                Mate
+              </span>
             </div>
           </div>
         </a>
@@ -118,13 +117,25 @@ function Navbar({ user = null, onLogout = () => {} }) {
           {/* Streak Icons — only show when logged in */}
           {userId && (
             <div className="flex items-center gap-6 ml-3">
-              <a href="/dsa-streak" className="flex flex-col items-center" title="DSA Streak">
+              <a
+                href="/dsa-streak"
+                className="flex flex-col items-center"
+                title="DSA Streak"
+              >
                 <FaFireAlt className="text-red-500 w-6 h-6" />
-                <span className="text-xs font-semibold text-slate-700">{profileLoading ? "…" : dsaStreak}</span>
+                <span className="text-xs font-semibold text-slate-700">
+                  {profileLoading ? "…" : dsaStreak}
+                </span>
               </a>
-              <a href="/aptitude-streak" className="flex flex-col items-center" title="Aptitude Streak">
+              <a
+                href="/aptitude-streak"
+                className="flex flex-col items-center"
+                title="Aptitude Streak"
+              >
                 <IoFlash className="text-yellow-400 w-6 h-6" />
-                <span className="text-xs font-semibold text-slate-700">{profileLoading ? "…" : aptitudeStreak}</span>
+                <span className="text-xs font-semibold text-slate-700">
+                  {profileLoading ? "…" : aptitudeStreak}
+                </span>
               </a>
             </div>
           )}
@@ -148,9 +159,21 @@ function Navbar({ user = null, onLogout = () => {} }) {
                   aria-haspopup="true"
                   aria-expanded={menuOpen}
                 >
-                  <FaUserCircle className="w-10 h-10 text-slate-600" />
+                  {profile?.profileImage ? (
+                    <img
+                      src={profile.profileImage}
+                      alt="profile"
+                      className="w-10 h-10 rounded-full object-cover border"
+                    />
+                  ) : (
+                    <FaUserCircle className="w-10 h-10 text-slate-600" />
+                  )}
+
                   <div className="hidden sm:block text-left">
-                    <div className="text-sm font-medium text-slate-800 truncate" style={{ maxWidth: 140 }}>
+                    <div
+                      className="text-sm font-medium text-slate-800 truncate"
+                      style={{ maxWidth: 140 }}
+                    >
                       {profile?.name ?? storedUser?.name ?? "You"}
                     </div>
                   </div>
@@ -225,11 +248,18 @@ function Navbar({ user = null, onLogout = () => {} }) {
                 <div className="flex items-center gap-6 pt-2">
                   <a href="/dsa-streak" className="flex flex-col items-center">
                     <Flame className="text-orange-500 w-6 h-6" />
-                    <span className="text-xs font-semibold text-gray-700">{profileLoading ? "…" : dsaStreak}</span>
+                    <span className="text-xs font-semibold text-gray-700">
+                      {profileLoading ? "…" : dsaStreak}
+                    </span>
                   </a>
-                  <a href="/aptitude-streak" className="flex flex-col items-center">
+                  <a
+                    href="/aptitude-streak"
+                    className="flex flex-col items-center"
+                  >
                     <Zap className="text-yellow-500 w-6 h-6" />
-                    <span className="text-xs font-semibold text-gray-700">{profileLoading ? "…" : aptitudeStreak}</span>
+                    <span className="text-xs font-semibold text-gray-700">
+                      {profileLoading ? "…" : aptitudeStreak}
+                    </span>
                   </a>
                 </div>
               )}
@@ -239,15 +269,23 @@ function Navbar({ user = null, onLogout = () => {} }) {
                 {!user && !userId ? (
                   <div className="flex gap-3">
                     <Button variant="outline" asChild className="w-full">
-                      <a href="/login" onClick={() => setIsOpen(false)}>Login</a>
+                      <a href="/login" onClick={() => setIsOpen(false)}>
+                        Login
+                      </a>
                     </Button>
                     <Button asChild className="w-full">
-                      <a href="/register" onClick={() => setIsOpen(false)}>Signup</a>
+                      <a href="/register" onClick={() => setIsOpen(false)}>
+                        Signup
+                      </a>
                     </Button>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    <a href="/profile" className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                    <a
+                      href="/profile"
+                      className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
                       Profile
                     </a>
                     <button
