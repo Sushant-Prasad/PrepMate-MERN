@@ -171,22 +171,11 @@ export default function DSASubmit() {
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-6 flex items-center justify-between gap-3"
+          className="mb-6 flex items-center justify-end"
         >
-          <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[var(--brand-secondary)] tracking-tight">
-              Submit Solution
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Solve the problem and run your code against sample tests or submit
-              for verdict.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={() => navigate(-1)}>
-              Back
-            </Button>
-          </div>
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            Back
+          </Button>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[460px_1fr] gap-6 items-start">
