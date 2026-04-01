@@ -7,11 +7,11 @@ import GroupModal from "./GroupModal";
 function ToggleButton({ label, isOpen, onToggle }) {
   return (
     <button
-      className="flex justify-between items-center w-full text-lg font-semibold mb-2 px-2 py-1 rounded hover:bg-gray-100"
+      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-[15px] font-semibold text-[var(--brand-secondary)] transition-colors hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_15%,white)]"
       onClick={onToggle}
     >
       <span>{label}</span>
-      <span className="text-xl font-bold">{isOpen ? "−" : "+"}</span>
+      <span className="text-xl font-bold text-[var(--brand-secondary)]">{isOpen ? "−" : "+"}</span>
     </button>
   );
 }
@@ -26,7 +26,7 @@ const getConversationDisplay = (conv, userId) => {
 
 export default function ChatSidebar({ onSelectConversation }) {
   // const { user } = useContext(AuthContext);
-  const { user, conversations, activeConversation, setActiveConversation, unreadMap, setUnreadMap, fetchMessages, setMessages, fetchConversations, getOrCreateDM } =
+  const { user, conversations, activeConversation, setActiveConversation, unreadMap, setUnreadMap, fetchConversations, getOrCreateDM } =
     useContext(ChatContext);
 
   const [openSections, setOpenSections] = useState({ directs: true, myGroups: true });
@@ -63,8 +63,9 @@ export default function ChatSidebar({ onSelectConversation }) {
   }, [unreadMap]);
 
   return (
-    <div className="w-1/4 border-r bg-white p-4 flex flex-col">
-      <h2 className="text-2xl font-bold mb-4 text-gray-700">Chats</h2>
+    <div className="z-10 flex w-full max-w-[340px] flex-col border-r border-border bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-primary)_8%,white),color-mix(in_srgb,var(--brand-primary)_3%,white))] p-4 md:p-5">
+      <h2 className="mb-1 text-2xl font-bold tracking-tight text-[var(--brand-secondary)]">Chats</h2>
+      <p className="mb-3 text-xs text-muted-foreground">Stay connected with your prep groups</p>
 
       <UserSearch
         onSelect={(item) => {
@@ -79,26 +80,26 @@ export default function ChatSidebar({ onSelectConversation }) {
 
 
 
-      <div className="flex-1 overflow-y-auto space-y-4 mt-4">
+      <div className="mt-4 flex-1 space-y-4 overflow-y-auto pr-1">
         {/* Direct Messages */}
         <div>
           <ToggleButton label="Direct Messages" isOpen={openSections.directs} onToggle={() => toggleSection("directs")} />
           {openSections.directs && (
-            <div className="ml-2">
+            <div className="ml-1 space-y-1">
               {directConversations.length ? directConversations.map((conv, idx) => {
                 const { name, avatar } = getConversationDisplay(conv, user._id);
                 return (
                   <div
                     key={conv._id || `dm-${idx}`}
                     onClick={() => handleSelectConversation(conv)}
-                    className={`p-2 rounded cursor-pointer hover:bg-gray-100 flex items-center gap-2 ${activeConversation?._id === conv._id ? "bg-gray-200" : ""}`}
+                    className={`flex cursor-pointer items-center gap-2 rounded-xl border px-2.5 py-2 text-sm transition-all ${activeConversation?._id === conv._id ? "border-[color:color-mix(in_srgb,var(--brand-primary)_45%,white)] bg-[color:color-mix(in_srgb,var(--brand-primary)_22%,white)] text-[var(--brand-secondary)] shadow-sm" : "border-transparent hover:border-[color:color-mix(in_srgb,var(--brand-primary)_28%,white)] hover:bg-accent"}`}
                   >
                     <img src={avatar} alt={name} className="w-8 h-8 rounded-full object-cover" />
-                    <span className="flex-1">{name}</span>
-                    {unreadMap[conv._id] && <span className="w-2 h-2 bg-red-500 rounded-full"></span>}
+                    <span className="flex-1 truncate">{name}</span>
+                    {unreadMap[conv._id] && <span className="h-2 w-2 rounded-full bg-[var(--brand-primary)]" />}
                   </div>
                 );
-              }) : <p className="text-gray-400 ml-2">No DMs yet</p>}
+              }) : <p className="text-muted-foreground ml-2">No DMs yet</p>}
             </div>
           )}
         </div>
@@ -107,27 +108,27 @@ export default function ChatSidebar({ onSelectConversation }) {
         <div>
           <ToggleButton label="Groups" isOpen={openSections.myGroups} onToggle={() => toggleSection("myGroups")} />
           {openSections.myGroups && (
-            <div className="ml-2">
+            <div className="ml-1 space-y-1">
               {myGroups.length ? myGroups.map((conv, idx) => {
                 const { name, avatar } = getConversationDisplay(conv, user._id);
                 return (
                   <div
                     key={conv._id || `group-${idx}`}
                     onClick={() => handleSelectConversation(conv)}
-                    className={`p-2 rounded cursor-pointer hover:bg-gray-100 flex items-center gap-2 ${activeConversation?._id === conv._id ? "bg-gray-200" : ""}`}
+                    className={`flex cursor-pointer items-center gap-2 rounded-xl border px-2.5 py-2 text-sm transition-all ${activeConversation?._id === conv._id ? "border-[color:color-mix(in_srgb,var(--brand-primary)_45%,white)] bg-[color:color-mix(in_srgb,var(--brand-primary)_22%,white)] text-[var(--brand-secondary)] shadow-sm" : "border-transparent hover:border-[color:color-mix(in_srgb,var(--brand-primary)_28%,white)] hover:bg-accent"}`}
                   >
                     <img src={avatar} alt={name} className="w-8 h-8 rounded-full object-cover" />
-                    <span className="flex-1">{name}</span>
-                    {unreadMap[conv._id] && <span className="w-2 h-2 bg-red-500 rounded-full"></span>}
+                    <span className="flex-1 truncate">{name}</span>
+                    {unreadMap[conv._id] && <span className="h-2 w-2 rounded-full bg-[var(--brand-primary)]" />}
                   </div>
                 );
-              }) : <p className="text-gray-400 ml-2">No groups yet</p>}
+              }) : <p className="text-muted-foreground ml-2">No groups yet</p>}
             </div>
           )}
         </div>
       </div>
 
-      <button onClick={() => setIsGroupModalOpen(true)} className="mt-4 px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
+      <button onClick={() => setIsGroupModalOpen(true)} className="mt-4 rounded-xl border border-[color:color-mix(in_srgb,var(--brand-secondary)_20%,white)] bg-[var(--brand-primary)] px-4 py-2.5 font-semibold text-[var(--brand-secondary)] transition-all hover:-translate-y-0.5 hover:bg-[var(--brand-secondary)] hover:text-white hover:shadow-md">
         + Create Group
       </button>
 

@@ -8,7 +8,7 @@ import MessageInput from "./MessageInput.jsx";
 
 export default function ChatWindow() {
   // const { user } = useContext(AuthContext);
-  const { user, activeConversation, setActiveConversation, fetchMessages, sendMessage, messages, setMessages, fetchConversations, joinGroup, leaveGroup, conversations, setShowGroupInfo } = useContext(ChatContext);
+  const { user, activeConversation, setActiveConversation, fetchMessages, sendMessage, messages, setMessages, joinGroup, leaveGroup, conversations, setShowGroupInfo } = useContext(ChatContext);
 
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -66,7 +66,7 @@ export default function ChatWindow() {
     };
 
     loadInitial();
-  }, [activeConversation, isMember]);
+  }, [activeConversation, isMember, fetchMessages, setMessages]);
 
   // ----------------- Auto-scroll on new messages -----------------
   useEffect(() => {
@@ -137,7 +137,7 @@ export default function ChatWindow() {
   };
 
   if (!activeConversation) {
-    return <div className="flex-1 flex items-center justify-center text-gray-400">Select a conversation to start chatting</div>;
+    return <div className="flex-1 flex items-center justify-center text-muted-foreground">Select a conversation to start chatting</div>;
   }
 
   const otherUser =
@@ -196,9 +196,9 @@ export default function ChatWindow() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50">
+    <div className="z-10 flex flex-1 flex-col bg-background/95">
       {/* Header */}
-      <div className="p-4 bg-white border-b flex items-center justify-between">
+      <div className="flex items-center justify-between border-b border-border bg-card/95 px-4 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-4">
           <img
             src={
@@ -206,10 +206,10 @@ export default function ChatWindow() {
                 ? activeConversation.groupImage || "/default-group.png"
                 : otherUser?.avatar || "/default-user.png"
             }
-            className="w-10 h-10 rounded-full"
+            className="h-10 w-10 rounded-full border border-[color:color-mix(in_srgb,var(--brand-primary)_35%,white)] object-cover"
             alt="avatar"
           />
-          <h2 className="text-xl font-bold">
+          <h2 className="text-xl font-bold tracking-tight text-[var(--brand-secondary)]">
             {isGroup ? activeConversation.name : otherUser?.name}
           </h2>
         </div>
@@ -218,7 +218,7 @@ export default function ChatWindow() {
         {isGroup && !isMember && (
           <button
             onClick={handleJoinGroup}
-            className="px-4 py-1 rounded bg-green-500 text-white hover:bg-green-600"
+            className="rounded-lg bg-[var(--brand-primary)] px-4 py-1.5 text-sm font-semibold text-[var(--brand-secondary)] transition-all hover:bg-[var(--brand-secondary)] hover:text-white"
           >
             Join
           </button>
@@ -228,15 +228,15 @@ export default function ChatWindow() {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setMenuOpen(prev => !prev)}
-              className="text-xl px-2"
+              className="rounded-md px-2 text-xl text-[var(--brand-secondary)] transition-colors hover:bg-accent"
             >
               ⋮
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow z-50">
+              <div className="absolute right-0 z-50 mt-2 w-40 rounded-lg border border-border bg-card shadow-lg">
                 <button
-                  className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                  className="block w-full px-4 py-2 text-left transition-colors hover:bg-accent"
                   onClick={() => {
                     setMenuOpen(false);
                     setShowGroupInfo(true); // ✅ switch view
@@ -263,12 +263,12 @@ export default function ChatWindow() {
 
 
       {/* Messages */}
-      <div ref={containerRef} className="flex-1 overflow-y-auto p-4 space-y-2">
+      <div ref={containerRef} className="flex-1 space-y-2 overflow-y-auto bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-primary)_5%,white),white)] p-4 md:p-5">
         {hasMore && (
           <button
             onClick={loadOlderMessages}
             disabled={loadingOlder}
-            className="mb-2 text-sm text-blue-500 hover:underline"
+            className="mb-2 rounded-full border border-[color:color-mix(in_srgb,var(--brand-primary)_35%,white)] bg-background px-3 py-1 text-xs font-semibold text-[var(--brand-secondary)] transition-colors hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)]"
           >
             {loadingOlder ? "Loading..." : "Load older messages"}
           </button>
@@ -283,8 +283,10 @@ export default function ChatWindow() {
             return (
               <React.Fragment key={msg._id}>
                 {showDaySeparator && (
-                  <div className="flex justify-center text-gray-500 text-sm my-2">
-                    {formatDate(msg.createdAt)}
+                  <div className="my-2 flex justify-center">
+                    <span className="rounded-full border border-border bg-background/90 px-3 py-1 text-xs text-muted-foreground shadow-sm">
+                      {formatDate(msg.createdAt)}
+                    </span>
                   </div>
                 )}
                 <MessageBubble message={msg}
@@ -294,7 +296,7 @@ export default function ChatWindow() {
             );
           })
         ) : (
-          <p className="text-gray-400 text-center mt-4">No messages yet</p>
+          <p className="text-muted-foreground text-center mt-4">No messages yet</p>
         )}
 
         <div ref={messagesEndRef} />
@@ -310,7 +312,7 @@ export default function ChatWindow() {
           onKeyPress={handleKeyPress}
         />
       ) : (
-        <div className="p-4 text-center text-gray-500 bg-gray-100">
+        <div className="border-t border-border bg-[color:color-mix(in_srgb,var(--brand-primary)_14%,white)] p-4 text-center text-[var(--brand-secondary)]">
           Join the group to start chatting
         </div>
       )}

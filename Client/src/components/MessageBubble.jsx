@@ -15,12 +15,10 @@ const MessageBubble = ({ message, isGroup }) => {
 
   const menuRef = useRef(null);
 
-  if (!message) return null;
-
-  const sender = message.sender || {};
-  const senderId = sender._id || message.senderId;
+  const sender = message?.sender || {};
+  const senderId = sender._id || message?.senderId;
   const isOwn = senderId === user?._id;
-  const messageText = message.content || message.message || "";
+  const messageText = message?.content || message?.message || "";
 
   const handleDelete = () => {
     if (!message._id) return;
@@ -44,27 +42,29 @@ const MessageBubble = ({ message, isGroup }) => {
 
 
   const filteredReadBy =
-    message.readBy?.filter(
+    message?.readBy?.filter(
       (u) => u._id?.toString() !== senderId?.toString()
     ) || [];
 
+  if (!message) return null;
+
 
   return (
-    <div className={`flex w-full mb-2 ${isOwn ? "justify-end" : "justify-start"}`}>
+    <div className={`mb-2 flex w-full ${isOwn ? "justify-end" : "justify-start"}`}>
       <div className="flex flex-col relative min-w-[50px]">
         {!isOwn && sender.name && (
-          <p className="text-xs font-semibold text-gray-600 mb-1">{sender.name}</p>
+          <p className="text-xs font-semibold text-muted-foreground mb-1">{sender.name}</p>
         )}
 
         <div
-          className={`relative max-w-xs md:max-w-md px-3 py-2 rounded-lg shadow ${isOwn
-            ? "bg-green-500 text-white rounded-br-none"
-            : "bg-gray-200 text-black rounded-bl-none"
+          className={`relative max-w-xs rounded-2xl border px-3 py-2 shadow-sm md:max-w-md ${isOwn
+            ? "rounded-br-sm border-[color:color-mix(in_srgb,var(--brand-secondary)_68%,black)] bg-[var(--brand-secondary)] text-white"
+            : "rounded-bl-sm border-[color:color-mix(in_srgb,var(--brand-primary)_30%,white)] bg-[color:color-mix(in_srgb,var(--brand-primary)_16%,white)] text-foreground"
             }`}
         >
           {isOwn && (
             <div
-              className="absolute top-1 right-1 cursor-pointer text-sm font-bold px-1 ml-2"
+              className="absolute top-1 right-1 cursor-pointer text-sm font-bold px-1 ml-2 text-white/70 hover:text-white"
               onClick={() => setShowMenu(!showMenu)}
             >
               ⋮
@@ -74,18 +74,18 @@ const MessageBubble = ({ message, isGroup }) => {
           {showMenu && isOwn && (
             <div
               ref={menuRef}
-              className="absolute top-5 right-0 bg-white border rounded shadow z-50 text-sm"
+              className="absolute top-5 right-0 bg-card text-card-foreground border border-border rounded-md shadow z-50 text-sm min-w-28"
             >
               {isGroup && (
                 <button
-                  className="block w-full text-left px-2 py-1 hover:bg-gray-100 text-black"
+                  className="block w-full text-left px-2 py-1 hover:bg-accent"
                   onClick={() => setShowReadBy(true)}
                 >
                   View readBy
                 </button>
               )}
               <button
-                className="block w-full text-left px-2 py-1 hover:bg-gray-100 text-red-500"
+                className="block w-full text-left px-2 py-1 hover:bg-accent text-red-500"
                 onClick={handleDelete}
               >
                 Delete
@@ -114,19 +114,19 @@ const MessageBubble = ({ message, isGroup }) => {
                 </video>
               )}
               {message.mediaType === "file" && (
-                <div className="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded-md shadow text-sm">
+                <div className="flex items-center gap-2 rounded-md border border-border bg-background/80 px-2 py-1 text-sm shadow">
                   <span>📄</span>
                   {["pdf", "png", "jpg", "jpeg", "gif"].includes(
                     message.mediaUrl.split(".").pop().toLowerCase()
                   ) && (
                       <button
                         onClick={() => handlePreview(message.mediaUrl)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-[var(--brand-secondary)] hover:opacity-80"
                       >
                         Preview
                       </button>
                     )}
-                  <span className="text-black">|</span>
+                  <span className="text-muted-foreground">|</span>
                   <button
                     onClick={async () => {
                       try {
@@ -144,7 +144,7 @@ const MessageBubble = ({ message, isGroup }) => {
                         console.error("Download failed:", err);
                       }
                     }}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-[var(--brand-secondary)] hover:opacity-80"
                   >
                     ⬇️
                   </button>
@@ -153,11 +153,11 @@ const MessageBubble = ({ message, isGroup }) => {
             </div>
           )}
 
-          {messageText && <p className="break-words mb-2">{messageText}</p>}
+          {messageText && <p className="mb-3 break-words pr-8 leading-relaxed">{messageText}</p>}
 
           {message.createdAt && (
             <span
-              className={`absolute bottom-0.5 right-2 text-[10px] ${isOwn ? "text-white/70" : "text-gray-500"
+              className={`absolute bottom-0.5 right-2 text-[10px] ${isOwn ? "text-white/70" : "text-muted-foreground"
                 }`}
             >
               {dayjs(message.createdAt).format("h:mm A")}
@@ -169,7 +169,7 @@ const MessageBubble = ({ message, isGroup }) => {
       {/* Media Preview Modal */}
       {showPreview && (
         <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
           onClick={() => setShowPreview(false)}
         >
           {message.mediaType === "image" ? (
@@ -181,7 +181,7 @@ const MessageBubble = ({ message, isGroup }) => {
           ) : (
             <iframe
               src={previewUrl}
-              className="min-w-[60vw] min-h-[80vh] rounded-lg bg-white"
+              className="min-w-[60vw] min-h-[80vh] rounded-lg bg-card"
               title="file preview"
             />
           )}
@@ -195,12 +195,12 @@ const MessageBubble = ({ message, isGroup }) => {
           onClick={() => setShowReadBy(false)}
         >
           <div
-            className="bg-white p-4 rounded shadow max-h-[70vh] overflow-y-auto"
+            className="bg-card text-card-foreground p-4 rounded-xl border border-border shadow max-h-[70vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-semibold mb-2">Read by:</h3>
             {filteredReadBy.length ? (
-              <ul className="list-disc pl-5 text-sm text-black">
+              <ul className="list-disc pl-5 text-sm">
                 {filteredReadBy.map((u, idx) => (
                   <li key={u._id || u.email || idx}>
                     {u.name || u.email}
@@ -208,7 +208,7 @@ const MessageBubble = ({ message, isGroup }) => {
                 ))}
               </ul>
             ) : (
-              <p className="text-black text-sm">No one else has read this yet</p>
+              <p className="text-muted-foreground text-sm">No one else has read this yet</p>
             )}
           </div>
         </div>

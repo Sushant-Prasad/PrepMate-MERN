@@ -1,11 +1,9 @@
 // src/components/GroupModal.jsx
-import { useState, useContext } from "react";
+import { useState } from "react";
 import api from "../utils/api";
-import { ChatContext } from "../context/ChatContext";
 import UserSearch from "./UserSearch";
 
 const GroupModal = ({ isOpen, onClose, onGroupCreated }) => {
-  const { user } = useContext(ChatContext);
   const [name, setName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [image, setImage] = useState(null);
@@ -62,16 +60,16 @@ const GroupModal = ({ isOpen, onClose, onGroupCreated }) => {
 
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-lg p-6 w-96">
-        <h2 className="text-xl font-semibold mb-4">Create Group</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-[2px] p-3">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-[0_18px_44px_color-mix(in_srgb,var(--brand-secondary)_24%,transparent)]">
+        <h2 className="mb-4 text-xl font-semibold tracking-tight text-[var(--brand-secondary)]">Create Group</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="text"
             placeholder="Group name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full rounded-lg border border-input bg-background p-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
             required
           />
 
@@ -84,11 +82,11 @@ const GroupModal = ({ isOpen, onClose, onGroupCreated }) => {
 
           {/* Show selected users */}
           {selectedUsers.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="mt-2 flex flex-wrap gap-2">
               {selectedUsers.map((u) => (
                 <span
                   key={u._id}
-                  className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm flex items-center gap-1"
+                  className="flex items-center gap-1 rounded-full bg-[color:color-mix(in_srgb,var(--brand-primary)_20%,white)] px-2 py-1 text-sm text-[var(--brand-secondary)]"
                 >
                   {u.email}
                   <button
@@ -111,20 +109,20 @@ const GroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             type="file"
             accept="image/*"
             onChange={(e) => setImage(e.target.files[0])}
-            className="w-full"
+            className="w-full text-sm text-muted-foreground"
           />
 
           <div className="flex justify-end gap-2 mt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+              className="rounded-lg bg-secondary px-4 py-2 text-secondary-foreground transition-opacity hover:opacity-90"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className={`px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 ${loading ? "opacity-50 cursor-not-allowed" : ""
+              className={`rounded-lg bg-[var(--brand-primary)] px-4 py-2 font-semibold text-[var(--brand-secondary)] transition-all hover:bg-[var(--brand-secondary)] hover:text-white ${loading ? "cursor-not-allowed opacity-50" : ""
                 }`}
               disabled={loading}
             >
