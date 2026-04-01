@@ -140,10 +140,10 @@ export default function DSASubmit() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[linear-gradient(135deg,rgba(61,191,217,0.14),rgba(255,255,255,1),rgba(3,4,94,0.1))] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading problem...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brand-secondary)] mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading problem...</p>
         </div>
       </div>
     );
@@ -151,10 +151,10 @@ export default function DSASubmit() {
 
   if (isError || !q) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
-        <Card className="p-6 max-w-md mx-auto">
+      <div className="min-h-screen bg-[linear-gradient(135deg,rgba(61,191,217,0.14),rgba(255,255,255,1),rgba(3,4,94,0.1))] flex items-center justify-center">
+        <Card className="p-6 max-w-md mx-auto border-border/70 shadow-lg">
           <div className="text-center">
-            <div className="text-red-600 mb-4">
+            <div className="text-destructive mb-4">
               {error?.message || "Failed to load problem"}
             </div>
             <Button onClick={() => navigate(-1)}>Go Back</Button>
@@ -165,7 +165,7 @@ export default function DSASubmit() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-[linear-gradient(135deg,rgba(61,191,217,0.14),rgba(255,255,255,1),rgba(3,4,94,0.1))]">
       <div className="mx-auto max-w-7xl px-4 py-6 md:py-10">
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -174,10 +174,10 @@ export default function DSASubmit() {
           className="mb-6 flex items-center justify-between gap-3"
         >
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[var(--brand-secondary)] tracking-tight">
               Submit Solution
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-muted-foreground mt-1">
               Solve the problem and run your code against sample tests or submit
               for verdict.
             </p>
@@ -191,8 +191,8 @@ export default function DSASubmit() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[460px_1fr] gap-6 items-start">
           {/* LEFT: Problem Details */}
-          <Card className="lg:sticky lg:top-6 overflow-hidden">
-            <CardHeader className="flex flex-col gap-2">
+          <Card className="lg:sticky lg:top-6 overflow-hidden border-border/70 shadow-xl bg-card/95 backdrop-blur">
+            <CardHeader className="flex flex-col gap-2 border-b bg-secondary/30">
               <div className="flex items-start justify-between gap-3">
                 <CardTitle className="text-xl leading-tight">
                   {q.title}
@@ -226,19 +226,19 @@ export default function DSASubmit() {
                 </Section>
 
                 <Section title="Constraints">
-                  <div className="text-sm whitespace-pre-wrap font-mono text-gray-700 bg-gray-50 p-3 rounded-md">
+                  <div className="text-sm whitespace-pre-wrap font-mono text-foreground/90 bg-secondary/40 border border-border/60 p-3 rounded-md">
                     {q.constraints}
                   </div>
                 </Section>
 
                 <div className="grid grid-cols-1 gap-3">
                   <Section title="Input Format">
-                    <div className="text-sm whitespace-pre-wrap bg-blue-50 p-3 rounded-md">
+                    <div className="text-sm whitespace-pre-wrap bg-[rgba(61,191,217,0.12)] border border-[rgba(61,191,217,0.3)] p-3 rounded-md">
                       {q.inputFormat}
                     </div>
                   </Section>
                   <Section title="Output Format">
-                    <div className="text-sm whitespace-pre-wrap bg-green-50 p-3 rounded-md">
+                    <div className="text-sm whitespace-pre-wrap bg-[rgba(3,4,94,0.08)] border border-[rgba(3,4,94,0.22)] p-3 rounded-md">
                       {q.outputFormat}
                     </div>
                   </Section>
@@ -251,34 +251,34 @@ export default function DSASubmit() {
                     {(q.testCases || []).map((tc, i) => (
                       <div
                         key={i}
-                        className="border rounded-md overflow-hidden"
+                        className="border border-border/70 rounded-md overflow-hidden"
                       >
-                        <div className="bg-gray-50 px-3 py-2 text-sm font-medium">
+                        <div className="bg-secondary/40 px-3 py-2 text-sm font-medium text-foreground/90">
                           Test Case {i + 1}
                         </div>
                         <div className="p-3 space-y-3">
                           <div>
-                            <div className="text-xs font-medium text-gray-600 mb-1">
+                            <div className="text-xs font-medium text-muted-foreground mb-1">
                               Input:
                             </div>
-                            <pre className="text-xs bg-gray-100 p-2 rounded overflow-x-auto whitespace-pre-wrap">
+                            <pre className="text-xs bg-secondary/50 p-2 rounded overflow-x-auto whitespace-pre-wrap">
                               {tc.input}
                             </pre>
                           </div>
                           <div>
-                            <div className="text-xs font-medium text-gray-600 mb-1">
+                            <div className="text-xs font-medium text-muted-foreground mb-1">
                               Expected Output:
                             </div>
-                            <pre className="text-xs bg-gray-100 p-2 rounded overflow-x-auto whitespace-pre-wrap">
+                            <pre className="text-xs bg-secondary/50 p-2 rounded overflow-x-auto whitespace-pre-wrap">
                               {tc.output}
                             </pre>
                           </div>
                           {tc.explanation && (
                             <div>
-                              <div className="text-xs font-medium text-gray-600 mb-1">
+                              <div className="text-xs font-medium text-muted-foreground mb-1">
                                 Explanation:
                               </div>
-                              <div className="text-xs text-gray-700 italic">
+                              <div className="text-xs text-foreground/80 italic">
                                 {tc.explanation}
                               </div>
                             </div>
@@ -293,10 +293,10 @@ export default function DSASubmit() {
           </Card>
 
           {/* RIGHT: Editor + Run/Submit */}
-          <Card className="h-[80vh] flex flex-col">
-            <CardHeader className="flex flex-col gap-3">
+          <Card className="h-[80vh] flex flex-col border-border/70 shadow-xl bg-card/95 backdrop-blur">
+            <CardHeader className="flex flex-col gap-3 border-b bg-secondary/30">
               <div className="flex items-center justify-between gap-3">
-                <CardTitle className="text-lg">Code Editor</CardTitle>
+                <CardTitle className="text-lg text-[var(--brand-secondary)]">Code Editor</CardTitle>
                 <div className="flex items-center gap-2">
                   <Select value={lang} onValueChange={handleLanguageChange}>
                     <SelectTrigger className="w-32">
@@ -330,7 +330,7 @@ export default function DSASubmit() {
                   </Button>
                 </div>
               </div>
-              <div className="text-xs text-gray-500 flex items-center justify-between">
+              <div className="text-xs text-muted-foreground flex items-center justify-between">
                 <span>{q.title}</span>
               </div>
             </CardHeader>
@@ -338,7 +338,7 @@ export default function DSASubmit() {
 
             <div className="flex-1 flex flex-col min-h-0">
               <div className="flex-1 p-4 space-y-4">
-                <div className="h-[350px] border rounded-md overflow-hidden">
+                <div className="h-[350px] border border-border/70 rounded-md overflow-hidden shadow-sm">
                   <Editor
                     height="100%"
                     defaultLanguage={mapToMonaco(lang)}
@@ -368,7 +368,7 @@ export default function DSASubmit() {
                   <TabsContent value="input" className="space-y-2">
                     <Label className="text-sm">Standard Input</Label>
                     <textarea
-                      className="w-full rounded-md border px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 font-mono"
+                      className="w-full rounded-md border border-border/70 bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] font-mono"
                       rows={4}
                       placeholder="Enter input for your program..."
                       value={stdin}
@@ -380,12 +380,12 @@ export default function DSASubmit() {
                     <div className="flex items-center justify-between">
                       <Label className="text-sm">Run Output</Label>
                       {result?.time && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-muted-foreground">
                           Time: {result.time}s • Memory: {result.memory}
                         </div>
                       )}
                     </div>
-                    <div className="border rounded-md p-3 bg-gray-50 min-h-[100px]">
+                    <div className="border border-border/70 rounded-md p-3 bg-secondary/35 min-h-[100px]">
                       <pre className="text-xs whitespace-pre-wrap font-mono">
                         {formatResult(result)}
                       </pre>
@@ -411,19 +411,19 @@ export default function DSASubmit() {
                         </div>
 
                         {submitResp.error ? (
-                          <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                          <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md border border-destructive/20">
                             {submitResp.error}
                           </div>
                         ) : (
                           <div className="space-y-3">
                             {submitResp.message && (
-                              <div className="text-sm p-3 bg-blue-50 rounded-md">
+                              <div className="text-sm p-3 bg-[rgba(61,191,217,0.12)] border border-[rgba(61,191,217,0.3)] rounded-md">
                                 {submitResp.message}
                               </div>
                             )}
 
                             {submitResp.streak && (
-                              <div className="text-sm text-green-700 bg-green-50 p-3 rounded-md">
+                              <div className="text-sm text-foreground bg-secondary/45 border border-border/60 p-3 rounded-md">
                                 🔥 Streak updated: Current{" "}
                                 {submitResp.streak.currentStreak}, Best{" "}
                                 {submitResp.streak.bestStreak}
@@ -436,8 +436,8 @@ export default function DSASubmit() {
                               []
                             ).length > 0 && (
                               <div className="overflow-x-auto">
-                                <table className="w-full text-xs border rounded-md">
-                                  <thead className="bg-gray-50">
+                                <table className="w-full text-xs border border-border/70 rounded-md">
+                                  <thead className="bg-secondary/50">
                                     <tr>
                                       <th className="p-2 border text-center">
                                         #
@@ -469,8 +469,8 @@ export default function DSASubmit() {
                                         key={i}
                                         className={
                                           tc.passed
-                                            ? "bg-green-50"
-                                            : "bg-red-50"
+                                            ? "bg-secondary/35"
+                                            : "bg-destructive/10"
                                         }
                                       >
                                         <td className="p-2 border text-center font-mono">
@@ -514,7 +514,7 @@ export default function DSASubmit() {
                       </div>
                     )}
                     {!submitResp && (
-                      <div className="text-center text-gray-500 py-8">
+                      <div className="text-center text-muted-foreground py-8">
                         Submit your solution to see results here
                       </div>
                     )}
@@ -532,7 +532,7 @@ export default function DSASubmit() {
 function Section({ title, children }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-gray-800 mb-2">{title}</h3>
+      <h3 className="text-sm font-semibold text-[var(--brand-secondary)] mb-2">{title}</h3>
       {children}
     </div>
   );

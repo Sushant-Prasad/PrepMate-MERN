@@ -52,10 +52,10 @@ const dsaQuestionSchema = new mongoose.Schema(
       required: true, // Expected output format
     },
     testCases: [testCaseSchema], // List of test cases for validating solutions
-    starterCode: [starterCodeSchema], // Starter code for multiple languages
     solution: {
-      type: String, // Official solution in a default/preferred language
-      required: true,
+      type: Map,
+      of: String,
+       required: true,
     },
     tags: [{ type: String }], // General tags (e.g., "array", "dynamic-programming")
     companyTags: [{ type: String }], // Company-specific tags (e.g., "Google", "Amazon")
@@ -71,7 +71,7 @@ const dsaQuestionSchema = new mongoose.Schema(
   },
   {
     timestamps: true, // Adds createdAt and updatedAt fields automatically
-  }
+  },
 );
 
 export default mongoose.model("DSAQuestion", dsaQuestionSchema);

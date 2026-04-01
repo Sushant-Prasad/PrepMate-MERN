@@ -7,7 +7,7 @@ import UserProfile from "../models/UserProfile.js";
 const JUDGE0_URL = "https://judge0-ce.p.rapidapi.com";
 const JUDGE0_HEADERS = {
   "Content-Type": "application/json",
-  "X-RapidAPI-Host": process.env.JUDGE0_API_HOST,
+  "X-RapidAPI-Host": process.env.JUDGE0_API_HOST || "judge0-ce.p.rapidapi.com",
   "X-RapidAPI-Key": process.env.JUDGE0_API_KEY,
 };
 
@@ -74,6 +74,10 @@ const updateDSAStreak = async (userId, questionId) => {
 // Submit DSA solution
 export const submitDSASolution = async (req, res) => {
   try {
+    if (!process.env.JUDGE0_API_KEY) {
+      return res.status(500).json({ message: "Judge0 API key is not configured" });
+    }
+
     const { questionId, code, language, mode } = req.body;
     const userId = req.user.id;
     // 1) Ensure question exists
@@ -234,6 +238,10 @@ export const getUserSubmissions = async (req, res) => {
 // Run DSA solution without saving to DB
 export const runDSA = async (req, res) => {
   try {
+    if (!process.env.JUDGE0_API_KEY) {
+      return res.status(500).json({ message: "Judge0 API key is not configured" });
+    }
+
     const { code, language, stdin } = req.body;
 
     if (!code || !language) {
