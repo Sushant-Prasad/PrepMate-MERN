@@ -38,8 +38,11 @@ export default function ChatSidebar({ onSelectConversation }) {
   const myGroups = conversations.filter(c => c.isGroup);
 
   const handleSelectConversation = async (conv) => {
-    setActiveConversation(conv);
-    onSelectConversation?.(conv);
+    if (onSelectConversation) {
+      onSelectConversation(conv);
+    } else {
+      setActiveConversation(conv);
+    }
 
     // const msgs = await fetchMessages(conv._id);
     // setMessages(msgs);
@@ -63,7 +66,7 @@ export default function ChatSidebar({ onSelectConversation }) {
   }, [unreadMap]);
 
   return (
-    <div className="z-10 flex w-full max-w-[340px] flex-col border-r border-border bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-primary)_8%,white),color-mix(in_srgb,var(--brand-primary)_3%,white))] p-4 md:p-5">
+    <div className="relative z-30 flex w-[320px] min-h-0 shrink-0 flex-col border-r border-border bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-primary)_8%,white),color-mix(in_srgb,var(--brand-primary)_3%,white))] p-4 md:w-[340px] md:p-5">
       <h2 className="mb-1 text-2xl font-bold tracking-tight text-[var(--brand-secondary)]">Chats</h2>
       <p className="mb-3 text-xs text-muted-foreground">Stay connected with your prep groups</p>
 
@@ -80,7 +83,7 @@ export default function ChatSidebar({ onSelectConversation }) {
 
 
 
-      <div className="mt-4 flex-1 space-y-4 overflow-y-auto pr-1">
+      <div className="mt-4 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
         {/* Direct Messages */}
         <div>
           <ToggleButton label="Direct Messages" isOpen={openSections.directs} onToggle={() => toggleSection("directs")} />
@@ -128,9 +131,14 @@ export default function ChatSidebar({ onSelectConversation }) {
         </div>
       </div>
 
-      <button onClick={() => setIsGroupModalOpen(true)} className="mt-4 rounded-xl border border-[color:color-mix(in_srgb,var(--brand-secondary)_20%,white)] bg-[var(--brand-primary)] px-4 py-2.5 font-semibold text-[var(--brand-secondary)] transition-all hover:-translate-y-0.5 hover:bg-[var(--brand-secondary)] hover:text-white hover:shadow-md">
-        + Create Group
-      </button>
+      <div className="mt-3 shrink-0 border-t border-[color:color-mix(in_srgb,var(--brand-secondary)_12%,white)] pt-3">
+        <button
+          onClick={() => setIsGroupModalOpen(true)}
+          className="w-full rounded-xl border border-[color:color-mix(in_srgb,var(--brand-secondary)_20%,white)] bg-[var(--brand-primary)] px-4 py-2.5 font-semibold text-[var(--brand-secondary)] transition-all hover:-translate-y-0.5 hover:bg-[var(--brand-secondary)] hover:text-white hover:shadow-md"
+        >
+          + Create Group
+        </button>
+      </div>
 
       <GroupModal
         isOpen={isGroupModalOpen}

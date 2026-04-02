@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useRef } from "react";
+import React, { createContext, useState, useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import api from "../utils/api";
 
@@ -109,7 +109,7 @@ export const ChatProvider = ({ children }) => {
 
   const fetchMe = async () => {
     try {
-      const res = await api.get("/me", {
+      const res = await api.get("/profiles/me", {
         withCredentials: true, // 🔥 required for cookies
       });
 
@@ -163,7 +163,7 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  const fetchMessages = async (conversationId, page = 0, limit = 30, setLocal = true) => {
+  const fetchMessages = useCallback(async (conversationId, page = 0, limit = 30, setLocal = true) => {
     if (!conversationId) return [];
 
     try {
@@ -181,7 +181,7 @@ export const ChatProvider = ({ children }) => {
       console.error("Failed to fetch messages:", err);
       return [];
     }
-  };
+  }, []);
 
   const sendMessage = async (conversationId, content = "", file = null) => {
     if (!conversationId || (!content && !file)) return;

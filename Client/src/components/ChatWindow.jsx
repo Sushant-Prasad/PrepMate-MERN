@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ChatContext } from "../context/ChatContext.jsx";
 // import { AuthContext } from "../context/AuthContext.jsx";
 import MessageBubble from "./MessageBubble.jsx";
@@ -14,12 +14,18 @@ export default function ChatWindow() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const [loadingConversation, setLoadingConversation] = useState(false);
 
   const containerRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const shouldAutoScrollRef = useRef(true);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const [messageQuery, setMessageQuery] = useState("");
+
+  const conversationId = activeConversation?._id;
+  const isGroupConversation = Boolean(activeConversation?.isGroup);
 
 
 
@@ -47,43 +53,82 @@ export default function ChatWindow() {
 
   // ----------------- Load initial messages -----------------
   useEffect(() => {
-    if (!activeConversation?._id) return;
+    if (!conversationId) return;
 
     // 🚫 Non-members cannot load messages
-    if (activeConversation.isGroup && !isMember) {
+    if (isGroupConversation && !isMember) {
       setMessages([]);
+      setInitialLoadDone(false);
       return;
     }
 
+    let cancelled = false;
 
     const loadInitial = async () => {
+      setLoadingConversation(true);
+      setInitialLoadDone(false);
       setPage(0);
       setHasMore(true);
-      const msgs = await fetchMessages(activeConversation._id, 0);
-      setMessages(msgs);
+      const msgs = await fetchMessages(conversationId, 0);
+      if (cancelled) return;
+      setMessages(msgs || []);
       setInitialLoadDone(true);
+      setLoadingConversation(false);
       requestAnimationFrame(() => scrollToBottom());
     };
 
     loadInitial();
-  }, [activeConversation, isMember, fetchMessages, setMessages]);
+
+    return () => {
+      cancelled = true;
+      setLoadingConversation(false);
+    };
+  }, [conversationId, isGroupConversation, isMember, fetchMessages, setMessages]);
+
+  // ----------------- Track manual scroll intent -----------------
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onScroll = () => {
+      const distanceFromBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight;
+      shouldAutoScrollRef.current = distanceFromBottom < 140;
+    };
+
+    container.addEventListener("scroll", onScroll);
+    onScroll();
+
+    return () => container.removeEventListener("scroll", onScroll);
+  }, []);
 
   // ----------------- Auto-scroll on new messages -----------------
   useEffect(() => {
     if (!initialLoadDone) return;
+
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom("smooth");
+    }
+  }, [messages, initialLoadDone]);
+
+  const scrollToBottom = (behavior = "auto") => {
     const container = containerRef.current;
     if (!container) return;
 
-    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (distanceFromBottom < 150) scrollToBottom();
-  }, [messages, initialLoadDone]);
-
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior,
+    });
+  };
 
   // ----------------- Load older messages -----------------
   const loadOlderMessages = async () => {
     if (!activeConversation?._id || loadingOlder || !hasMore) return;
     setLoadingOlder(true);
+
+    const container = containerRef.current;
+    const prevScrollHeight = container?.scrollHeight || 0;
+    const prevScrollTop = container?.scrollTop || 0;
 
     const nextPage = page + 1;
     const older = await fetchMessages(activeConversation._id, nextPage);
@@ -96,6 +141,14 @@ export default function ChatWindow() {
         return [...older.filter(m => !existingIds.has(m._id)), ...prev];
       });
       setPage(nextPage);
+
+      requestAnimationFrame(() => {
+        const currContainer = containerRef.current;
+        if (!currContainer) return;
+
+        const newScrollHeight = currContainer.scrollHeight;
+        currContainer.scrollTop = newScrollHeight - prevScrollHeight + prevScrollTop;
+      });
     }
 
     setLoadingOlder(false);
@@ -135,6 +188,16 @@ export default function ChatWindow() {
       handleSend();
     }
   };
+
+  const visibleMessages = useMemo(() => {
+    const q = messageQuery.trim().toLowerCase();
+    if (!q) return messages;
+
+    return messages.filter((m) => {
+      const content = (m?.content || m?.message || "").toLowerCase();
+      return content.includes(q);
+    });
+  }, [messages, messageQuery]);
 
   if (!activeConversation) {
     return <div className="flex-1 flex items-center justify-center text-muted-foreground">Select a conversation to start chatting</div>;
@@ -196,10 +259,11 @@ export default function ChatWindow() {
   };
 
   return (
-    <div className="z-10 flex flex-1 flex-col bg-background/95">
+    <div className="z-0 flex min-w-0 flex-1 flex-col bg-background/95">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border bg-card/95 px-4 py-3 backdrop-blur-sm">
-        <div className="flex items-center gap-4">
+      <div className="sticky top-0 z-20 border-b border-border bg-card/95 px-4 py-3 backdrop-blur-sm">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
           <img
             src={
               isGroup
@@ -214,48 +278,61 @@ export default function ChatWindow() {
           </h2>
         </div>
 
-        {/* Header actions */}
-        {isGroup && !isMember && (
-          <button
-            onClick={handleJoinGroup}
-            className="rounded-lg bg-[var(--brand-primary)] px-4 py-1.5 text-sm font-semibold text-[var(--brand-secondary)] transition-all hover:bg-[var(--brand-secondary)] hover:text-white"
-          >
-            Join
-          </button>
-        )}
+          <div className="flex flex-col gap-2 md:min-w-[360px] md:max-w-md md:flex-1">
+            <input
+              type="text"
+              value={messageQuery}
+              onChange={(e) => setMessageQuery(e.target.value)}
+              placeholder="Search messages..."
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none ring-offset-background transition focus:border-[color:color-mix(in_srgb,var(--brand-primary)_45%,white)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--brand-primary)_30%,white)]"
+            />
 
-        {isGroup && isMember && (
-          <div className="relative" ref={menuRef}>
-            <button
-              onClick={() => setMenuOpen(prev => !prev)}
-              className="rounded-md px-2 text-xl text-[var(--brand-secondary)] transition-colors hover:bg-accent"
-            >
-              ⋮
-            </button>
-
-            {menuOpen && (
-              <div className="absolute right-0 z-50 mt-2 w-40 rounded-lg border border-border bg-card shadow-lg">
+            <div className="flex items-center justify-end gap-2">
+              {/* Header actions */}
+              {isGroup && !isMember && (
                 <button
-                  className="block w-full px-4 py-2 text-left transition-colors hover:bg-accent"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    setShowGroupInfo(true); // ✅ switch view
-                  }}
+                  onClick={handleJoinGroup}
+                  className="rounded-lg bg-[var(--brand-primary)] px-4 py-1.5 text-sm font-semibold text-[var(--brand-secondary)] transition-all hover:bg-[var(--brand-secondary)] hover:text-white"
                 >
-                  Group Info
+                  Join
                 </button>
+              )}
+
+              {isGroup && isMember && (
+                <div className="relative" ref={menuRef}>
+                  <button
+                    onClick={() => setMenuOpen(prev => !prev)}
+                    className="rounded-md px-2 text-xl text-[var(--brand-secondary)] transition-colors hover:bg-accent"
+                  >
+                    ⋮
+                  </button>
+
+                  {menuOpen && (
+                    <div className="absolute right-0 z-50 mt-2 w-40 rounded-lg border border-border bg-card shadow-lg">
+                      <button
+                        className="block w-full px-4 py-2 text-left transition-colors hover:bg-accent"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setShowGroupInfo(true); // ✅ switch view
+                        }}
+                      >
+                        Group Info
+                      </button>
 
 
-                <button
-                  className="block w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
-                  onClick={handleLeaveGroup}
-                >
-                  Leave Group
-                </button>
-              </div>
-            )}
+                      <button
+                        className="block w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
+                        onClick={handleLeaveGroup}
+                      >
+                        Leave Group
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
 
@@ -264,6 +341,7 @@ export default function ChatWindow() {
 
       {/* Messages */}
       <div ref={containerRef} className="flex-1 space-y-2 overflow-y-auto bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-primary)_5%,white),white)] p-4 md:p-5">
+
         {hasMore && (
           <button
             onClick={loadOlderMessages}
@@ -274,9 +352,11 @@ export default function ChatWindow() {
           </button>
         )}
 
-        {messages.length ? (
-          messages.map((msg, idx) => {
-            const prevMsg = messages[idx - 1];
+        {loadingConversation ? (
+          <div className="mt-10 text-center text-sm text-muted-foreground">Loading messages...</div>
+        ) : visibleMessages.length ? (
+          visibleMessages.map((msg, idx) => {
+            const prevMsg = visibleMessages[idx - 1];
             const showDaySeparator =
               !prevMsg || new Date(prevMsg.createdAt).toDateString() !== new Date(msg.createdAt).toDateString();
 
@@ -296,7 +376,9 @@ export default function ChatWindow() {
             );
           })
         ) : (
-          <p className="text-muted-foreground text-center mt-4">No messages yet</p>
+          <p className="text-muted-foreground text-center mt-4">
+            {messageQuery.trim() ? "No matching messages" : "No messages yet"}
+          </p>
         )}
 
         <div ref={messagesEndRef} />

@@ -1,35 +1,19 @@
 
-import React, { useState, useContext, useEffect } from "react";
-import { ChatContext } from "../context/ChatContext.jsx";
+import React, { useState, useEffect, useCallback } from "react";
 import api from "../utils/api";
-import axios from "axios";
 
 export default function UserSearch({ onSelect, mode = "sidebar" }) {
-  const { user } = useContext(ChatContext);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      return;
-    }
-
-    const delayDebounce = setTimeout(() => {
-      fetchResults(query);
-    }, 300);
-
-    return () => clearTimeout(delayDebounce);
-  }, [query]);
-
-  const fetchResults = async (searchQuery) => {
+  const fetchResults = useCallback(async (searchQuery) => {
     setLoading(true);
     try {
       if (mode === "sidebar") {
         const [userRes, groupRes] = await Promise.all([
-          api.get(`/profiles/user/search?query=${searchQuery}`),
-          api.get(`/group/search?query=${searchQuery}`)
+          api.get(`/profiles/search?query=${encodeURIComponent(searchQuery)}`),
+          api.get(`/group/search?query=${encodeURIComponent(searchQuery)}`)
         ]);
 
         const users = (userRes.data.data || []).map(u => ({
@@ -46,7 +30,7 @@ export default function UserSearch({ onSelect, mode = "sidebar" }) {
         setResults([...users, ...groups]);
       } else {
         // Group modal → users only
-        const res = await api.get(`/profiles/user/search?query=${searchQuery}`);
+        const res = await api.get(`/profiles/search?query=${encodeURIComponent(searchQuery)}`);
         setResults(
           (res.data.data || []).map(u => ({
             ...u,
@@ -60,7 +44,20 @@ export default function UserSearch({ onSelect, mode = "sidebar" }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [mode]);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const delayDebounce = setTimeout(() => {
+      fetchResults(query);
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query, fetchResults]);
 
   const handleSelect = (item) => {
     if (!onSelect) return;        // 🛡️ SAFETY GUARD
