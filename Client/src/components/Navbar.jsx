@@ -1,6 +1,6 @@
 // src/components/Navbar.jsx
 import { useState, useRef, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -83,13 +83,13 @@ function Navbar({ onLogout = () => {} }) {
   ];
 
   const navBaseClass =
-    "rounded-lg px-3 py-2 text-sm font-semibold transition-all duration-200";
+    "rounded-lg px-4 py-2.5 text-sm font-bold tracking-wide transition-all duration-300 relative";
 
   const getNavClass = ({ isActive }) =>
     `${navBaseClass} ${
       isActive
-        ? "bg-[color:color-mix(in_srgb,var(--brand-primary)_22%,white)] text-[var(--brand-secondary)] shadow-sm"
-        : "text-slate-700 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
+        ? "bg-gradient-to-r from-[var(--brand-primary)] to-[#6EDBF0] text-white shadow-md font-extrabold"
+        : "text-slate-700 hover:text-[var(--brand-secondary)] hover:shadow-sm"
     }`;
 
   useEffect(() => {
@@ -246,7 +246,13 @@ function Navbar({ onLogout = () => {} }) {
       {/* Mobile Nav */}
       <AnimatePresence>
         {isOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
+          <Motion.div
+            className="md:hidden overflow-hidden bg-white border-t border-gray-200 shadow-lg"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.28, ease: "easeInOut" }}
+          >
             <div className="flex flex-col px-6 py-4 space-y-4">
               {navLinks.map((link, i) => (
                 <NavLink
@@ -319,7 +325,7 @@ function Navbar({ onLogout = () => {} }) {
                 )}
               </div>
             </div>
-          </div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </nav>
