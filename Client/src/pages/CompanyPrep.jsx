@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDSAQuestions, useDSAByCompanyTag } from "../services/DSAServices";
 import { useAptiQuestions } from "../services/aptitudeServices";
 import { submitAptitudeAnswer } from "../services/aptitudeSubmitServices";
-import { Search, Building2, Code, Brain, ChevronRight, ChevronDown, ChevronUp, Trophy, Target, Sparkles } from "lucide-react";
+import { Search, Building2, Code, Brain, ChevronRight, ChevronDown, ChevronUp, Trophy, Target, Sparkles, ListFilter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -29,6 +29,7 @@ export default function CompanyPrep() {
   const [activeTab, setActiveTab] = useState("DSA");
   const [searchQuery, setSearchQuery] = useState("");
   const [openSubcats, setOpenSubcats] = useState({});
+  const [showMobileCompanies, setShowMobileCompanies] = useState(false);
 
   // Fetch all questions to extract unique companies
   const { data: allDSAQuestionsData, isLoading: dsaLoading } = useDSAQuestions();
@@ -60,6 +61,8 @@ export default function CompanyPrep() {
 
   const isLoading = dsaLoading || aptitudeLoading;
   const isCompanyDataLoading = companyDSALoading || companyAptitudeLoading;
+  const shouldShowSidebarOnMobile = showMobileCompanies || !selectedCompany;
+  const shouldShowMainOnMobile = !showMobileCompanies && !!selectedCompany;
 
   /*------------- Helpers for Aptitude Subcategories -----------*/
   const aptitudeQuestionsAll = companyAptitudeQuestionsData?.data ?? [];
@@ -85,11 +88,11 @@ export default function CompanyPrep() {
   /********* Rendering components *********/
   const ProblemListItem = ({ q, index, onClick }) => (
     <div
-      className="group flex items-center justify-between p-5 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-transparent cursor-pointer border-l-4 border-transparent hover:border-l-[#36B9D0] transition-all duration-200"
+      className="group flex items-center justify-between gap-2 p-3 sm:p-5 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-transparent cursor-pointer border-l-4 border-transparent hover:border-l-[#36B9D0] transition-all duration-200"
       onClick={onClick}
     >
       <div className="flex items-center gap-4 flex-1 min-w-0">
-        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-[#36B9D0] to-cyan-500 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-[#36B9D0] to-cyan-500 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-sm">
           {index}
         </div>
         <h3 className="text-sm font-semibold text-[#001845] truncate group-hover:text-[#36B9D0] transition-colors">
@@ -98,7 +101,7 @@ export default function CompanyPrep() {
       </div>
       <Badge
         variant="outline"
-        className={`capitalize text-xs font-semibold ml-3 px-3 py-1 ${getDifficultyColor(q.difficulty)}`}
+        className={`capitalize text-[11px] sm:text-xs font-semibold ml-2 sm:ml-3 px-2 sm:px-3 py-1 ${getDifficultyColor(q.difficulty)}`}
       >
         {q.difficulty || "unknown"}
       </Badge>
@@ -152,7 +155,7 @@ export default function CompanyPrep() {
     };
 
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between">
           <div className="flex-1">
             <div className="flex items-start gap-3 mb-4">
@@ -162,7 +165,7 @@ export default function CompanyPrep() {
               <h4 className="font-semibold text-[#001845] text-base leading-relaxed">{question.statement}</h4>
             </div>
 
-            <div className="space-y-3 ml-11">
+            <div className="space-y-3 mt-1 sm:ml-11">
               <RadioGroup
                 value={choice}
                 onValueChange={(v) => !submitted && setChoice(v)}
@@ -215,7 +218,7 @@ export default function CompanyPrep() {
             </div>
           </div>
 
-          <div className="mt-4 md:mt-0 md:ml-6 md:w-48 flex flex-col items-start md:items-end space-y-2">
+          <div className="mt-4 md:mt-0 md:ml-6 md:w-48 flex flex-row flex-wrap items-center gap-2 md:flex-col md:items-end md:space-y-2">
             {question.expectedTime && (
               <div className="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
                 <Target className="w-3.5 h-3.5" />
@@ -230,7 +233,7 @@ export default function CompanyPrep() {
           </div>
         </div>
 
-        <div className="mt-6 ml-11 flex items-center justify-between gap-4 flex-wrap">
+        <div className="mt-6 flex items-center justify-between gap-4 flex-wrap sm:ml-11">
           <div className="flex items-center gap-3">
             {!submitted ? (
               <Button
@@ -286,7 +289,7 @@ export default function CompanyPrep() {
         </div>
 
         {showSolution && question.solution && (
-          <div className="mt-6 ml-11 p-5 rounded-xl bg-gradient-to-br from-[#001845] to-[#36B9D0] text-white shadow-md">
+          <div className="mt-6 p-4 sm:p-5 rounded-xl bg-gradient-to-br from-[#001845] to-[#36B9D0] text-white shadow-md sm:ml-11">
             <div className="flex items-center gap-2 font-bold text-lg mb-3">
               <Sparkles className="w-5 h-5" />
               Solution
@@ -302,10 +305,12 @@ export default function CompanyPrep() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50/30 to-blue-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50/30 to-blue-50">
+      <div className="mx-auto flex h-screen w-full max-w-[1600px] flex-col lg:flex-row">
       {/* Sidebar */}
-      <aside className="w-80 bg-white shadow-lg border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-200 bg-gradient-to-br from-[#001845] to-[#36B9D0]">
+      <aside className={`${shouldShowSidebarOnMobile ? "flex" : "hidden"} w-full border-b border-gray-200 bg-white shadow-lg lg:flex lg:w-80 lg:border-b-0 lg:border-r lg:shadow-none xl:w-96`}>
+        <div className="flex w-full flex-col min-h-0">
+        <div className="p-4 sm:p-6 border-b border-gray-200 bg-gradient-to-br from-[#001845] to-[#36B9D0]">
           <h1 className="text-2xl font-bold text-white mb-1 flex items-center gap-2">
             <Building2 className="w-6 h-6" />
             Company Prep
@@ -323,7 +328,7 @@ export default function CompanyPrep() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center p-8">
               <div className="w-10 h-10 border-4 border-gray-200 border-t-[#36B9D0] rounded-full animate-spin mb-3"></div>
@@ -341,6 +346,7 @@ export default function CompanyPrep() {
                       setSelectedCompany(c);
                       setActiveTab("DSA");
                       setOpenSubcats({});
+                      setShowMobileCompanies(false);
                     }}
                     className={`w-full text-left px-4 py-3 rounded-xl mb-2 flex items-center justify-between transition-all duration-200 ${
                       selectedCompany === c
@@ -361,22 +367,30 @@ export default function CompanyPrep() {
             </div>
           )}
         </div>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
+      <main className={`${shouldShowMainOnMobile ? "flex" : "hidden"} min-h-0 flex-1 flex-col lg:flex`}>
         {selectedCompany && (
-          <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-white border-b border-gray-200 px-4 py-4 shadow-sm sm:px-6">
+            <div className="mb-3 flex items-center justify-between gap-3">
               <h2 className="text-xl font-bold text-[#001845] flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-[#36B9D0]" />
                 {selectedCompany}
               </h2>
+              <button
+                onClick={() => setShowMobileCompanies(true)}
+                className="inline-flex items-center gap-2 rounded-lg border border-[#36B9D0]/30 px-3 py-2 text-sm font-semibold text-[#001845] transition-colors hover:bg-cyan-50 lg:hidden"
+              >
+                <ListFilter className="h-4 w-4 text-[#36B9D0]" />
+                Companies
+              </button>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               <button
                 onClick={() => setActiveTab("DSA")}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all sm:px-5 ${
                   activeTab === "DSA"
                     ? "bg-gradient-to-r from-[#36B9D0] to-cyan-500 text-white shadow-md"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -387,7 +401,7 @@ export default function CompanyPrep() {
               </button>
               <button
                 onClick={() => setActiveTab("Aptitude")}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all sm:px-5 ${
                   activeTab === "Aptitude"
                     ? "bg-gradient-to-r from-[#001845] to-[#36B9D0] text-white shadow-md"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -400,7 +414,7 @@ export default function CompanyPrep() {
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {!selectedCompany ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="bg-white rounded-2xl p-12 shadow-lg max-w-md">
@@ -440,22 +454,22 @@ export default function CompanyPrep() {
                 aptitudeBySub.map(({ sub, items }) => {
                   const open = !!openSubcats[sub];
                   return (
-                    <div key={sub} className="mb-5">
+                    <div key={sub} className="mb-4 sm:mb-5">
                       <button
                         onClick={() => toggleSub(sub)}
-                        className="w-full flex items-center justify-between bg-white p-5 rounded-xl border-2 border-gray-200 hover:border-[#36B9D0] hover:shadow-md transition-all"
+                        className="w-full flex items-center justify-between gap-2 bg-white p-3 sm:p-5 rounded-xl border-2 border-gray-200 hover:border-[#36B9D0] hover:shadow-md transition-all"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#001845] to-[#36B9D0] text-white flex items-center justify-center font-bold">
+                        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-[#001845] to-[#36B9D0] text-white flex items-center justify-center font-bold">
                             {items.length}
                           </div>
-                          <div className="text-left">
+                          <div className="min-w-0 text-left">
                             <span className="text-base font-bold text-[#001845] block">{sub}</span>
                             <span className="text-xs text-gray-500">{items.length} question{items.length !== 1 ? "s" : ""}</span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <Badge variant="outline" className="text-xs font-semibold border-[#36B9D0] text-[#36B9D0] px-3 py-1">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <Badge variant="outline" className="hidden sm:inline-flex text-xs font-semibold border-[#36B9D0] text-[#36B9D0] px-3 py-1">
                             {selectedCompany}
                           </Badge>
                           <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -479,6 +493,7 @@ export default function CompanyPrep() {
           )}
         </div>
       </main>
+      </div>
     </div>
   );
 }
