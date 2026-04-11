@@ -1,7 +1,7 @@
 // src/components/Navbar.jsx
 import { useState, useRef, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { FaFireAlt, FaUserCircle } from "react-icons/fa";
@@ -9,19 +9,40 @@ import { IoFlash } from "react-icons/io5";
 import { useUserProfile } from "@/services/profileServices";
 import logoSrc from "@/assets/FullLogo.jpg";
 
-function Navbar({ user = null, onLogout = () => {} }) {
+function Navbar({ onLogout = () => {} }) {
   const [isOpen, setIsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [storedUser, setStoredUser] = useState(null);
   const avatarRef = useRef(null);
+  const location = useLocation();
 
-  // derive current userId from localStorage (same parsing logic used across app)
-  let storedUser = null;
-  try {
-    const raw = localStorage.getItem("user");
-    if (raw) storedUser = JSON.parse(raw);
-  } catch {
-    // ignore parse errors
-  }
+  const readStoredUser = () => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  // Keep auth UI synced with localStorage changes and route transitions.
+  useEffect(() => {
+    setStoredUser(readStoredUser());
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const syncAuth = () => setStoredUser(readStoredUser());
+    window.addEventListener("storage", syncAuth);
+    window.addEventListener("focus", syncAuth);
+    window.addEventListener("auth-changed", syncAuth);
+
+    return () => {
+      window.removeEventListener("storage", syncAuth);
+      window.removeEventListener("focus", syncAuth);
+      window.removeEventListener("auth-changed", syncAuth);
+    };
+  }, []);
+
   const userId =
     storedUser?.id ?? storedUser?._id ?? storedUser?.userId ?? null;
 
@@ -146,9 +167,9 @@ function Navbar({ user = null, onLogout = () => {} }) {
             </div>
           )}
 
-          {/* Auth Buttons / User Icon */}
+          {/* Auth / Profile */}
           <div className="flex items-center gap-3 ml-4">
-            {!user && !userId ? (
+            {!userId ? (
               <>
                 <Button variant="outline" asChild>
                   <Link to="/login">Login</Link>
@@ -199,6 +220,7 @@ function Navbar({ user = null, onLogout = () => {} }) {
                       <button
                         onClick={() => {
                           setMenuOpen(false);
+                          setStoredUser(null);
                           onLogout();
                         }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -259,9 +281,9 @@ function Navbar({ user = null, onLogout = () => {} }) {
                 </div>
               )}
 
-              {/* Auth Buttons / User Icon - Mobile */}
+              {/* Auth / Profile - Mobile */}
               <div className="pt-2">
-                {!user && !userId ? (
+                {!userId ? (
                   <div className="flex gap-3">
                     <Button variant="outline" asChild className="w-full">
                       <Link to="/login" onClick={() => setIsOpen(false)}>
@@ -286,6 +308,7 @@ function Navbar({ user = null, onLogout = () => {} }) {
                     <button
                       onClick={() => {
                         setIsOpen(false);
+                        setStoredUser(null);
                         onLogout();
                       }}
                       className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
