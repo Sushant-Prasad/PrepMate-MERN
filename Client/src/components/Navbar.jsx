@@ -1,11 +1,11 @@
 // src/components/Navbar.jsx
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
+import { Link, NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Flame, Zap } from "lucide-react";
-import { FaFireAlt } from "react-icons/fa";
+import { Menu, X } from "lucide-react";
+import { FaFireAlt, FaUserCircle } from "react-icons/fa";
 import { IoFlash } from "react-icons/io5";
-import { FaUserCircle } from "react-icons/fa";
 import { useUserProfile } from "@/services/profileServices";
 import logoSrc from "@/assets/FullLogo.jpg";
 
@@ -19,7 +19,7 @@ function Navbar({ user = null, onLogout = () => {} }) {
   try {
     const raw = localStorage.getItem("user");
     if (raw) storedUser = JSON.parse(raw);
-  } catch (e) {
+  } catch {
     // ignore parse errors
   }
   const userId =
@@ -61,6 +61,16 @@ function Navbar({ user = null, onLogout = () => {} }) {
     { name: "CompanyPrep", href: "/company" },
   ];
 
+  const navBaseClass =
+    "rounded-lg px-3 py-2 text-sm font-semibold transition-all duration-200";
+
+  const getNavClass = ({ isActive }) =>
+    `${navBaseClass} ${
+      isActive
+        ? "bg-[color:color-mix(in_srgb,var(--brand-primary)_22%,white)] text-[var(--brand-secondary)] shadow-sm"
+        : "text-slate-700 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
+    }`;
+
   useEffect(() => {
     function handleClickOutside(e) {
       if (avatarRef.current && !avatarRef.current.contains(e.target)) {
@@ -75,8 +85,8 @@ function Navbar({ user = null, onLogout = () => {} }) {
     <nav className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo (image) + Text */}
-        <a
-          href="/"
+        <Link
+          to="/"
           className="flex items-center gap-3 no-underline"
           aria-label="PrepMate home"
         >
@@ -96,29 +106,25 @@ function Navbar({ user = null, onLogout = () => {} }) {
               </span>
             </div>
           </div>
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-6">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 rounded-xl border border-[color:color-mix(in_srgb,var(--brand-primary)_16%,white)] bg-white/80 p-1">
             {navLinks.map((link, i) => (
-              <motion.a
-                key={i}
-                href={link.href}
-                className="text-slate-700 hover:text-indigo-600 font-medium transition-colors"
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                {link.name}
-              </motion.a>
+              <div key={i}>
+                <NavLink to={link.href} end={link.href === "/"} className={getNavClass}>
+                  {link.name}
+                </NavLink>
+              </div>
             ))}
           </div>
 
           {/* Streak Icons — only show when logged in */}
           {userId && (
             <div className="flex items-center gap-6 ml-3">
-              <a
-                href="/dsa-streak"
+              <Link
+                to="/dsa-streak"
                 className="flex flex-col items-center"
                 title="DSA Streak"
               >
@@ -126,9 +132,9 @@ function Navbar({ user = null, onLogout = () => {} }) {
                 <span className="text-xs font-semibold text-slate-700">
                   {profileLoading ? "…" : dsaStreak}
                 </span>
-              </a>
-              <a
-                href="/aptitude-streak"
+              </Link>
+              <Link
+                to="/aptitude-streak"
                 className="flex flex-col items-center"
                 title="Aptitude Streak"
               >
@@ -136,7 +142,7 @@ function Navbar({ user = null, onLogout = () => {} }) {
                 <span className="text-xs font-semibold text-slate-700">
                   {profileLoading ? "…" : aptitudeStreak}
                 </span>
-              </a>
+              </Link>
             </div>
           )}
 
@@ -145,10 +151,10 @@ function Navbar({ user = null, onLogout = () => {} }) {
             {!user && !userId ? (
               <>
                 <Button variant="outline" asChild>
-                  <a href="/login">Login</a>
+                  <Link to="/login">Login</Link>
                 </Button>
                 <Button asChild>
-                  <a href="/register">Signup</a>
+                  <Link to="/register">Signup</Link>
                 </Button>
               </>
             ) : (
@@ -182,20 +188,14 @@ function Navbar({ user = null, onLogout = () => {} }) {
                 {/* Dropdown */}
                 <AnimatePresence>
                   {menuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                      transition={{ duration: 0.12 }}
-                      className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50"
-                    >
-                      <a
-                        href="/profile"
+                    <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
+                      <Link
+                        to="/profile"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         onClick={() => setMenuOpen(false)}
                       >
                         Profile
-                      </a>
+                      </Link>
                       <button
                         onClick={() => {
                           setMenuOpen(false);
@@ -205,7 +205,7 @@ function Navbar({ user = null, onLogout = () => {} }) {
                       >
                         Logout
                       </button>
-                    </motion.div>
+                    </div>
                   )}
                 </AnimatePresence>
               </div>
@@ -224,43 +224,38 @@ function Navbar({ user = null, onLogout = () => {} }) {
       {/* Mobile Nav */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            className="md:hidden bg-white border-t border-gray-200 shadow-lg"
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            transition={{ duration: 0.28 }}
-          >
+          <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
             <div className="flex flex-col px-6 py-4 space-y-4">
               {navLinks.map((link, i) => (
-                <a
+                <NavLink
                   key={i}
-                  href={link.href}
-                  className="text-gray-700 hover:text-indigo-600 font-medium transition-colors"
+                  to={link.href}
+                  end={link.href === "/"}
+                  className={getNavClass}
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
-                </a>
+                </NavLink>
               ))}
 
               {/* Streak Icons - Mobile (only when logged in) */}
               {userId && (
                 <div className="flex items-center gap-6 pt-2">
-                  <a href="/dsa-streak" className="flex flex-col items-center">
-                    <Flame className="text-orange-500 w-6 h-6" />
+                  <Link to="/dsa-streak" className="flex flex-col items-center">
+                    <FaFireAlt className="text-red-500 w-6 h-6" />
                     <span className="text-xs font-semibold text-gray-700">
                       {profileLoading ? "…" : dsaStreak}
                     </span>
-                  </a>
-                  <a
-                    href="/aptitude-streak"
+                  </Link>
+                  <Link
+                    to="/aptitude-streak"
                     className="flex flex-col items-center"
                   >
-                    <Zap className="text-yellow-500 w-6 h-6" />
+                    <IoFlash className="text-yellow-400 w-6 h-6" />
                     <span className="text-xs font-semibold text-gray-700">
                       {profileLoading ? "…" : aptitudeStreak}
                     </span>
-                  </a>
+                  </Link>
                 </div>
               )}
 
@@ -269,25 +264,25 @@ function Navbar({ user = null, onLogout = () => {} }) {
                 {!user && !userId ? (
                   <div className="flex gap-3">
                     <Button variant="outline" asChild className="w-full">
-                      <a href="/login" onClick={() => setIsOpen(false)}>
+                      <Link to="/login" onClick={() => setIsOpen(false)}>
                         Login
-                      </a>
+                      </Link>
                     </Button>
                     <Button asChild className="w-full">
-                      <a href="/register" onClick={() => setIsOpen(false)}>
+                      <Link to="/register" onClick={() => setIsOpen(false)}>
                         Signup
-                      </a>
+                      </Link>
                     </Button>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    <a
-                      href="/profile"
+                    <Link
+                      to="/profile"
                       className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
                       onClick={() => setIsOpen(false)}
                     >
                       Profile
-                    </a>
+                    </Link>
                     <button
                       onClick={() => {
                         setIsOpen(false);
@@ -301,7 +296,7 @@ function Navbar({ user = null, onLogout = () => {} }) {
                 )}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </nav>

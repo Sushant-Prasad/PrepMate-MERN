@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Code2,
   Brain,
@@ -12,15 +12,16 @@ import {
 } from "lucide-react";
 
 function Home() {
-  const [hoveredCard, setHoveredCard] = useState(null);
+  const navigate = useNavigate();
 
   const features = [
     {
       icon: Code2,
       title: "DSA Practice",
       description:
-        "Master algorithms with 500+ curated problems. Real-time code execution with Judge0 integration.",
+        "Practice company-tagged DSA questions with structured difficulty levels and coding-focused preparation for placement rounds.",
       stats: "500+ Problems",
+      href: "/dsa",
      
       color: "from-[var(--brand-secondary)] to-[var(--brand-primary)]",
     },
@@ -28,24 +29,26 @@ function Home() {
       icon: Brain,
       title: "Aptitude Tests",
       description:
-        "Ace quantitative & logical reasoning with adaptive difficulty and detailed explanations.",
+        "Prepare quantitative, logical, and verbal aptitude with practice tests built for placement screening patterns.",
       stats: "1000+ Questions",
+      href: "/aptitude",
       color: "from-[var(--brand-primary)] to-[#6EDBF0]",
     },
     {
       icon: Users,
       title: "Study Rooms",
       description:
-        "Collaborate in real-time with peers. Share screens, discuss solutions, and learn together.",
-      stats: "Live Sessions",
+        "Create groups, share notes, and chat with peers in StudyRooms so your prep stays collaborative and consistent.",
+      stats: "Groups, Notes & Chat",
+      href: "/rooms",
       color: "from-[#021B79] to-[var(--brand-secondary)]",
     },
   ];
 
   const stats = [
     { icon: Users, value: "10K+", label: "Active Learners" },
-    { icon: BookOpen, value: "2000+", label: "Problems Solved Daily" },
-    { icon: Trophy, value: "95%", label: "Interview Success Rate" },
+    { icon: BookOpen, value: "2K+", label: "Daily Practice Attempts" },
+    { icon: Trophy, value: "24/7", label: "StudyRoom Collaboration" },
   ];
 
   return (
@@ -65,38 +68,44 @@ function Home() {
             {/* Main Heading */}
             <div className="space-y-4">
               <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-tight">
-                Master Your
+                Crack Your
                 <span className="block mt-2 bg-gradient-to-r from-[var(--brand-secondary)] via-[var(--brand-primary)] to-[#6EDBF0] bg-clip-text text-transparent">
-                  Tech Interview
+                  Placement Journey
                 </span>
               </h1>
               <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-                Your complete platform for{" "}
+                PrepMate helps you prepare for placements with{" "}
                 <span className="font-bold text-[var(--brand-secondary)]">
-                  DSA mastery
+                  DSA practice
                 </span>
                 ,{" "}
                 <span className="font-bold text-[var(--brand-primary)]">
-                  aptitude excellence
+                  aptitude preparation
                 </span>{" "}
                 and{" "}
                 <span className="font-bold text-[#0096C7]">
-                  collaborative learning
+                  StudyRoom collaboration
                 </span>
-                . Join thousands preparing for their dream tech careers.
+                . Create groups, share notes, and chat while you prepare together.
               </p>
             </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-              <button className="group relative px-8 py-4 bg-gradient-to-r from-[var(--brand-secondary)] to-[var(--brand-primary)] text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center gap-2">
+              <button
+                onClick={() => navigate("/company")}
+                className="group relative px-8 py-4 bg-gradient-to-r from-[var(--brand-secondary)] to-[var(--brand-primary)] text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center gap-2"
+              >
                 <Zap className="w-5 h-5" />
-                Start Learning Now
+                Start Placement Prep
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="px-8 py-4 bg-white text-[var(--brand-secondary)] rounded-2xl font-semibold shadow-md hover:shadow-lg border-2 border-[var(--brand-primary)] hover:border-[var(--brand-secondary)] transform hover:-translate-y-1 transition-all duration-200 flex items-center gap-2">
+              <button
+                onClick={() => navigate("/rooms")}
+                className="px-8 py-4 bg-white text-[var(--brand-secondary)] rounded-2xl font-semibold shadow-md hover:shadow-lg border-2 border-[var(--brand-primary)] hover:border-[var(--brand-secondary)] transform hover:-translate-y-1 transition-all duration-200 flex items-center gap-2"
+              >
                 <Users className="w-5 h-5" />
-                Join Study Room
+                Open StudyRoom
               </button>
             </div>
 
@@ -124,10 +133,10 @@ function Home() {
         <div className="max-w-7xl mx-auto px-6 py-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-              Everything You Need to Succeed
+              One Platform for Complete Placement Prep
             </h2>
             <p className="text-gray-600 text-lg">
-              Comprehensive tools designed for serious learners
+              Practice, collaborate, and stay interview-ready with focused workflows
             </p>
           </div>
 
@@ -135,9 +144,16 @@ function Home() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                onMouseEnter={() => setHoveredCard(index)}
-                onMouseLeave={() => setHoveredCard(null)}
-                className="group relative bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-[rgba(3,4,94,0.06)] overflow-hidden"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(feature.href)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    navigate(feature.href);
+                  }
+                }}
+                className="group relative cursor-pointer bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border border-[rgba(3,4,94,0.06)] overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]"
               >
                 {/* Gradient Background on Hover */}
                 <div
@@ -169,9 +185,11 @@ function Home() {
                   </div>
 
                   {/* Arrow indicator */}
-                  <div className="mt-6 flex items-center text-[var(--brand-secondary)] font-semibold opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-2 transition-all duration-300">
-                    <span className="text-sm">Explore</span>
-                    <ArrowRight className="w-4 h-4 ml-1" />
+                  <div className="mt-8 border-t border-[rgba(3,4,94,0.08)] pt-4">
+                    <div className="inline-flex items-center text-[var(--brand-secondary)] font-semibold opacity-90 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-2 transition-all duration-300">
+                      <span className="text-sm">Explore</span>
+                      <ArrowRight className="w-4 h-4 ml-1" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -179,20 +197,8 @@ function Home() {
           </div>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="max-w-4xl mx-auto px-6 py-16">
-          <div className="bg-gradient-to-r from-[var(--brand-secondary)] to-[#001845] rounded-3xl p-12 text-center shadow-2xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Ready to Level Up Your Skills?
-            </h2>
-            <p className="text-[rgba(202,240,248,0.9)] text-lg mb-8">
-              Join thousands of learners crushing their interview prep goals
-            </p>
-            <button className="px-10 py-4 bg-white text-[var(--brand-secondary)] rounded-2xl font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 border border-[var(--brand-primary)]">
-              Get Started Free
-            </button>
-          </div>
-        </div>
+        
+        
       </div>
 
       <style jsx>{`
