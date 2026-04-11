@@ -28,7 +28,7 @@ export default function MessageInput({ value, onChange, onSend, onKeyPress, onSe
   };
 
   return (
-    <div className="flex items-end gap-2 border-t border-border bg-card/95 p-3 backdrop-blur-sm">
+    <div className="flex flex-wrap items-end gap-2 border-t border-border bg-card/95 p-3 backdrop-blur-sm sm:flex-nowrap">
       {/* Hidden file input */}
       <input
         type="file"
@@ -74,7 +74,7 @@ export default function MessageInput({ value, onChange, onSend, onKeyPress, onSe
 
       {/* Text input */}
       <textarea
-        className="max-h-28 flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 leading-relaxed shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+        className="order-3 max-h-28 min-h-[40px] w-full flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 leading-relaxed shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] sm:order-none sm:w-auto"
         rows={1}
         placeholder="Type a message"
         value={value}

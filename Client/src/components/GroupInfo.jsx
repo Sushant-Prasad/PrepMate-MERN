@@ -51,29 +51,31 @@ export default function GroupInfo() {
 
 
     return (
-        <div className="flex-1 p-6 bg-gray-50 overflow-y-auto">
+        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-primary)_7%,white),white)] p-4 sm:p-6">
+            <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border bg-card/95 p-4 shadow-sm sm:p-6">
             {/* Header */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="mb-6 flex items-center gap-3 sm:gap-4">
                 <button
                     onClick={() => setShowGroupInfo(false)}
-                    className="text-blue-500"
+                    className="rounded-md border border-border px-2 py-1 text-sm font-semibold text-[var(--brand-secondary)] transition-colors hover:bg-accent"
                 >
-                    ← Back
+                    Back
                 </button>
-                <h2 className="text-2xl font-bold ">Group Info</h2>
+                <h2 className="text-xl font-bold text-[var(--brand-secondary)] sm:text-2xl">Group Info</h2>
             </div>
 
             {/* Group Image */}
             <img
                 src={activeConversation.groupImage || "/default-group.png"}
-                className="w-32 h-32 rounded-full mx-auto mb-4"
+                className="mx-auto mb-4 h-24 w-24 rounded-full border border-border object-cover sm:h-32 sm:w-32"
+                alt="Group"
             />
 
             {isAdmin && (
                 <input
                     type="file"
                     onChange={(e) => setImage(e.target.files[0])}
-                    className="mb-4 flex mx-auto"
+                    className="mx-auto mb-4 block w-full max-w-xs text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-[var(--brand-primary)] file:px-3 file:py-2 file:font-semibold file:text-[var(--brand-secondary)]"
                 />
             )}
 
@@ -82,39 +84,39 @@ export default function GroupInfo() {
                 value={name}
                 disabled={!isAdmin}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 border rounded mb-4"
+                className="mb-4 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--brand-primary)_30%,white)]"
             />
 
             {isAdmin && (
                 <button
                     onClick={handleSave}
                     disabled={loading}
-                    className="w-full bg-blue-500 text-white py-2 rounded mb-6"
+                    className="mb-6 w-full rounded-lg bg-[var(--brand-primary)] py-2 font-semibold text-[var(--brand-secondary)] transition-colors hover:bg-[var(--brand-secondary)] hover:text-white"
                 >
                     Save Changes
                 </button>
             )}
 
             {/* Members */}
-            <h3 className="font-semibold mb-2">Participants</h3>
+            <h3 className="mb-2 font-semibold text-[var(--brand-secondary)]">Participants</h3>
             <div className="space-y-2">
                 {uniqueParticipants.map(p => (
                     <div
                         key={p._id}
-                        className="flex justify-between items-center bg-white p-2 rounded"
+                        className="flex items-center justify-between rounded-lg border border-border bg-background p-3"
                     >
-                        <div>
-                            <p>{p.name}</p>
+                        <div className="min-w-0">
+                            <p className="truncate font-medium text-foreground">{p.name}</p>
 
                             {p._id?.toString() === activeConversation.admin?._id?.toString() && (
-                                <span className="text-xs text-blue-500">Admin</span>
+                                <span className="text-xs text-[var(--brand-secondary)]">Admin</span>
                             )}
                         </div>
 
                         {isAdmin && p._id !== user._id && (
                             <button
                                 onClick={() => kickMember(activeConversation._id, p._id)}
-                                className="text-red-500 text-sm"
+                                className="rounded-md px-2 py-1 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
                             >
                                 Kick
                             </button>
@@ -127,11 +129,12 @@ export default function GroupInfo() {
             {isAdmin && (
                 <button
                     onClick={handleDelete}
-                    className="w-full mt-6 bg-red-600 text-white py-2 rounded"
+                    className="mt-6 w-full rounded-lg bg-red-600 py-2 font-semibold text-white transition-colors hover:bg-red-700"
                 >
                     Delete Group
                 </button>
             )}
+            </div>
         </div>
     );
 }

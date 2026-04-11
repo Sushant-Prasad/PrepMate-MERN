@@ -250,6 +250,11 @@ export default function ChatWindow() {
     }
   };
 
+  const handleBackToList = () => {
+    setShowGroupInfo(false);
+    setActiveConversation(null);
+  };
+
 
 
   // ----------------- Helper for day separator -----------------
@@ -264,6 +269,12 @@ export default function ChatWindow() {
       <div className="sticky top-0 z-20 border-b border-border bg-card/95 px-4 py-3 backdrop-blur-sm">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
+          <button
+            onClick={handleBackToList}
+            className="rounded-md border border-border px-2 py-1 text-sm font-semibold text-[var(--brand-secondary)] transition-colors hover:bg-accent md:hidden"
+          >
+            Back
+          </button>
           <img
             src={
               isGroup
@@ -273,12 +284,12 @@ export default function ChatWindow() {
             className="h-10 w-10 rounded-full border border-[color:color-mix(in_srgb,var(--brand-primary)_35%,white)] object-cover"
             alt="avatar"
           />
-          <h2 className="text-xl font-bold tracking-tight text-[var(--brand-secondary)]">
+          <h2 className="max-w-[45vw] truncate text-xl font-bold tracking-tight text-[var(--brand-secondary)] md:max-w-none">
             {isGroup ? activeConversation.name : otherUser?.name}
           </h2>
         </div>
 
-          <div className="flex flex-col gap-2 md:min-w-[360px] md:max-w-md md:flex-1">
+          <div className="flex w-full flex-col gap-2 md:min-w-[360px] md:max-w-md md:flex-1">
             <input
               type="text"
               value={messageQuery}

@@ -66,7 +66,7 @@ export default function ChatSidebar({ onSelectConversation }) {
   }, [unreadMap]);
 
   return (
-    <div className="relative z-30 flex w-[320px] min-h-0 shrink-0 flex-col border-r border-border bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-primary)_8%,white),color-mix(in_srgb,var(--brand-primary)_3%,white))] p-4 md:w-[340px] md:p-5">
+    <div className="relative z-30 flex w-full min-h-0 flex-col border-r border-border bg-[linear-gradient(180deg,color-mix(in_srgb,var(--brand-primary)_8%,white),color-mix(in_srgb,var(--brand-primary)_3%,white))] p-4 md:w-[340px] md:shrink-0 md:p-5">
       <h2 className="mb-1 text-2xl font-bold tracking-tight text-[var(--brand-secondary)]">Chats</h2>
       <p className="mb-3 text-xs text-muted-foreground">Stay connected with your prep groups</p>
 
