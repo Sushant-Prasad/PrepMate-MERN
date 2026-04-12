@@ -212,10 +212,10 @@ function Navbar({ onLogout = () => {} }) {
                     <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
                       <Link
                         to="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        className="block px-4 py-2.5 text-sm font-bold tracking-wide text-slate-700 transition-all duration-200 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
                         onClick={() => setMenuOpen(false)}
                       >
-                        Profile
+                        My Profile
                       </Link>
                       <button
                         onClick={() => {
@@ -223,9 +223,9 @@ function Navbar({ onLogout = () => {} }) {
                           setStoredUser(null);
                           onLogout();
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        className="w-full text-left px-4 py-2.5 text-sm font-bold tracking-wide text-slate-700 transition-all duration-200 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
                       >
-                        Logout
+                        Sign Out
                       </button>
                     </div>
                   )}
@@ -306,10 +306,10 @@ function Navbar({ onLogout = () => {} }) {
                   <div className="flex flex-col gap-2">
                     <Link
                       to="/profile"
-                      className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+                      className="rounded-lg px-4 py-2.5 text-sm font-bold tracking-wide text-slate-700 transition-all duration-200 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
                       onClick={() => setIsOpen(false)}
                     >
-                      Profile
+                      My Profile
                     </Link>
                     <button
                       onClick={() => {
@@ -317,9 +317,9 @@ function Navbar({ onLogout = () => {} }) {
                         setStoredUser(null);
                         onLogout();
                       }}
-                      className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+                      className="w-full rounded-lg px-4 py-2.5 text-left text-sm font-bold tracking-wide text-slate-700 transition-all duration-200 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
                     >
-                      Logout
+                      Sign Out
                     </button>
                   </div>
                 )}
