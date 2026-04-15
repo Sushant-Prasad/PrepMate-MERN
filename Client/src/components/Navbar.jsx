@@ -24,8 +24,6 @@ function Navbar({ onLogout = () => {} }) {
       return null;
     }
   };
-
-  // Keep auth UI synced with localStorage changes and route transitions.
   useEffect(() => {
     setStoredUser(readStoredUser());
   }, [location.pathname]);
