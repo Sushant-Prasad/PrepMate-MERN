@@ -264,7 +264,7 @@ function Navbar({ onLogout = () => {} }) {
                 </NavLink>
               ))}
 
-              {/* Streak Icons - Mobile (only when logged in) */}
+              {/* Streak Icons - Mobile */}
               {userId && (
                 <div className="flex items-center gap-6 pt-2">
                   <Link to="/dsa-streak" className="flex flex-col items-center">
