@@ -249,7 +249,7 @@ export default function DSAStreak() {
 
   return (
     <>
-      <div className="min-h-screen bg-background" style={{ backgroundImage: "linear-gradient(135deg, color-mix(in srgb, var(--brand-primary) 12%, transparent) 0%, transparent 45%, color-mix(in srgb, var(--brand-secondary) 9%, transparent) 100%)" }}>
+      <div className="min-h-screen bg-gradient-to-br from-[#03c6f7c9] via-[#F5FCFF] to-[#7859dd] overflow-hidden">
         <div className="mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-6 md:py-10">
           <motion.div
             initial={{ opacity: 0, y: -8 }}
