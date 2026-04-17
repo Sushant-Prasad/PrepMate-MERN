@@ -88,7 +88,7 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#03c6f7c9] via-[#F5FCFF] to-[#7859dd] overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#03c6f7c9] via-[#F5FCFF] to-[#7859dd] overflow-hidden flex items-center justify-center px-4 py-4">
       {/* Animated background elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
@@ -120,33 +120,33 @@ const Login = ({ onLogin }) => {
           {/* Gradient header accent */}
           <div className="h-1 bg-gradient-to-r from-[var(--brand-secondary)] via-[var(--brand-primary)] to-[#6EDBF0]" />
 
-          <CardHeader className="pb-4">
+          <CardHeader className="pb-3">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.4 }}
               className="text-center"
             >
-              <div className="flex justify-center mb-4">
+              <div className="flex justify-center mb-2">
                 <motion.div
                   animate={{ y: [0, -4, 0] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="inline-flex p-3 rounded-2xl"
+                  className="inline-flex p-2 rounded-xl"
                   style={{ background: "linear-gradient(135deg, var(--brand-secondary), var(--brand-primary))" }}
                 >
-                  <Lock className="w-6 h-6 text-white" />
+                  <Lock className="w-5 h-5 text-white" />
                 </motion.div>
               </div>
-              <CardTitle className="text-3xl font-extrabold bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(90deg, var(--brand-secondary) 0%, var(--brand-primary) 100%)" }}>
+              <CardTitle className="text-2xl font-extrabold bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(90deg, var(--brand-secondary) 0%, var(--brand-primary) 100%)" }}>
                 Welcome Back
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-2 font-medium">Sign in to your account to continue</p>
+              <p className="text-xs text-gray-600 mt-1 font-medium">Sign in to continue</p>
             </motion.div>
           </CardHeader>
 
           <Separator className="bg-gradient-to-r from-transparent via-[var(--brand-primary)] to-transparent opacity-30" />
 
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 pb-4">
             {/* success message banner */}
             {successMessage && (
               <motion.div
@@ -154,25 +154,25 @@ const Login = ({ onLogin }) => {
                 animate={{ opacity: 1, y: 0, x: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="mb-5 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border-l-4 border-emerald-500 px-4 py-3 flex items-start gap-3"
+                className="mb-3 rounded-lg bg-gradient-to-r from-emerald-50 to-green-50 border-l-4 border-emerald-500 px-3 py-2 flex items-start gap-2"
                 role="status"
                 aria-live="polite"
               >
-                <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-emerald-700 font-semibold">{successMessage}</p>
+                <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-emerald-700 font-semibold">{successMessage}</p>
               </motion.div>
             )}
 
-            <form className="space-y-5" onSubmit={handleLogin}>
+            <form className="space-y-3" onSubmit={handleLogin}>
               {/* Email Input */}
               <motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.15, duration: 0.3 }}
               >
-                <Label htmlFor="email" className="text-sm font-semibold text-gray-700 mb-2 block">Email Address</Label>
+                <Label htmlFor="email" className="text-xs font-semibold text-gray-700 mb-1.5 block">Email</Label>
                 <div className="relative group">
-                  <Mail className="absolute left-3.5 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-[var(--brand-primary)] transition-colors" />
+                  <Mail className="absolute left-3 top-2.5 w-4 h-4 text-gray-400 group-focus-within:text-[var(--brand-primary)] transition-colors" />
                   <Input
                     id="email"
                     type="email"
@@ -180,7 +180,7 @@ const Login = ({ onLogin }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="pl-10 rounded-lg border-2 border-gray-200 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--brand-primary)_20%,white)] transition-all duration-200 placeholder-gray-400"
+                    className="pl-9 rounded-lg border-2 border-gray-200 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--brand-primary)_20%,white)] transition-all duration-200 placeholder-gray-400 text-sm h-9"
                   />
                 </div>
               </motion.div>
@@ -191,9 +191,9 @@ const Login = ({ onLogin }) => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.25, duration: 0.3 }}
               >
-                <Label htmlFor="password" className="text-sm font-semibold text-gray-700 mb-2 block">Password</Label>
+                <Label htmlFor="password" className="text-xs font-semibold text-gray-700 mb-1.5 block">Password</Label>
                 <div className="relative group">
-                  <Lock className="absolute left-3.5 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-[var(--brand-primary)] transition-colors" />
+                  <Lock className="absolute left-3 top-2.5 w-4 h-4 text-gray-400 group-focus-within:text-[var(--brand-primary)] transition-colors" />
                   <Input
                     id="password"
                     type="password"
@@ -201,7 +201,7 @@ const Login = ({ onLogin }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-10 rounded-lg border-2 border-gray-200 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--brand-primary)_20%,white)] transition-all duration-200 placeholder-gray-400"
+                    className="pl-9 rounded-lg border-2 border-gray-200 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--brand-primary)_20%,white)] transition-all duration-200 placeholder-gray-400 text-sm h-9"
                   />
                 </div>
               </motion.div>
@@ -213,11 +213,11 @@ const Login = ({ onLogin }) => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.2 }}
-                  className="rounded-lg bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 px-4 py-3 flex items-start gap-3"
+                  className="rounded-lg bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 px-3 py-2 flex items-start gap-2"
                   role="alert"
                 >
-                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-red-700 font-semibold">{error}</p>
+                  <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-red-700 font-semibold">{error}</p>
                 </motion.div>
               )}
 
@@ -230,7 +230,7 @@ const Login = ({ onLogin }) => {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-11 rounded-lg font-semibold text-white transition-all duration-200 relative overflow-hidden group"
+                  className="w-full h-9 rounded-lg font-semibold text-white text-sm transition-all duration-200 relative overflow-hidden group"
                   style={{
                     background: loading ? "var(--brand-primary)" : "linear-gradient(135deg, var(--brand-secondary), var(--brand-primary))",
                   }}
@@ -238,7 +238,7 @@ const Login = ({ onLogin }) => {
                   <motion.div
                     whileHover={!loading ? { scale: 1.05 } : {}}
                     whileTap={!loading ? { scale: 0.98 } : {}}
-                    className="flex items-center justify-center gap-2 w-full"
+                    className="flex items-center justify-center gap-1.5 w-full"
                   >
                     {loading ? (
                       <>
@@ -246,7 +246,7 @@ const Login = ({ onLogin }) => {
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         >
-                          <Loader2 className="w-5 h-5" />
+                          <Loader2 className="w-4 h-4" />
                         </motion.div>
                         <span>Signing in…</span>
                       </>
@@ -266,7 +266,7 @@ const Login = ({ onLogin }) => {
               </motion.div>
             </form>
 
-            <Separator className="my-6 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+            <Separator className="my-3 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
 
             {/* Register Link */}
             <motion.div
@@ -275,7 +275,7 @@ const Login = ({ onLogin }) => {
               transition={{ delay: 0.45, duration: 0.3 }}
               className="text-center"
             >
-              <p className="text-sm text-gray-600">
+              <p className="text-xs text-gray-600">
                 Don't have an account?{" "}
                 <motion.button
                   type="button"
