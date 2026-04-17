@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Mail, Lock, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -87,85 +88,206 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#03c6f7c9] via-[#F5FCFF] to-[#7859dd] overflow-hidden flex items-center justify-center px-4 py-8">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          className="absolute w-72 h-72 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          style={{ background: "var(--brand-primary)" }}
+          animate={{
+            x: [0, 100, 0],
+            y: [0, -100, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute w-72 h-72 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          style={{ background: "var(--brand-secondary)" }}
+          animate={{
+            x: [100, -100, 100],
+            y: [100, 0, 100],
+          }}
+          transition={{ duration: 15, repeat: Infinity, delay: 2, ease: "easeInOut" }}
+        />
+      </div>
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-md relative z-10"
       >
-        <Card className="shadow-lg border rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-center text-2xl font-bold text-gray-800">
-              Login
-            </CardTitle>
+        <Card className="shadow-2xl border border-white/40 backdrop-blur-sm bg-white/95 rounded-3xl overflow-hidden">
+          {/* Gradient header accent */}
+          <div className="h-1 bg-gradient-to-r from-[var(--brand-secondary)] via-[var(--brand-primary)] to-[#6EDBF0]" />
+
+          <CardHeader className="pb-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="text-center"
+            >
+              <div className="flex justify-center mb-4">
+                <motion.div
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="inline-flex p-3 rounded-2xl"
+                  style={{ background: "linear-gradient(135deg, var(--brand-secondary), var(--brand-primary))" }}
+                >
+                  <Lock className="w-6 h-6 text-white" />
+                </motion.div>
+              </div>
+              <CardTitle className="text-3xl font-extrabold bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(90deg, var(--brand-secondary) 0%, var(--brand-primary) 100%)" }}>
+                Welcome Back
+              </CardTitle>
+              <p className="text-sm text-gray-600 mt-2 font-medium">Sign in to your account to continue</p>
+            </motion.div>
           </CardHeader>
 
-          <Separator />
+          <Separator className="bg-gradient-to-r from-transparent via-[var(--brand-primary)] to-transparent opacity-30" />
 
           <CardContent className="pt-6">
             {/* success message banner */}
             {successMessage && (
               <motion.div
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25 }}
-                className="mb-4 rounded-md bg-green-50 border border-green-100 text-green-800 px-4 py-2 text-sm font-medium"
+                initial={{ opacity: 0, y: -10, x: -20 }}
+                animate={{ opacity: 1, y: 0, x: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="mb-5 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border-l-4 border-emerald-500 px-4 py-3 flex items-start gap-3"
                 role="status"
                 aria-live="polite"
               >
-                {successMessage}
+                <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-emerald-700 font-semibold">{successMessage}</p>
               </motion.div>
             )}
 
             <form className="space-y-5" onSubmit={handleLogin}>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+              {/* Email Input */}
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15, duration: 0.3 }}
+              >
+                <Label htmlFor="email" className="text-sm font-semibold text-gray-700 mb-2 block">Email Address</Label>
+                <div className="relative group">
+                  <Mail className="absolute left-3.5 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-[var(--brand-primary)] transition-colors" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="pl-10 rounded-lg border-2 border-gray-200 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--brand-primary)_20%,white)] transition-all duration-200 placeholder-gray-400"
+                  />
+                </div>
+              </motion.div>
 
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
+              {/* Password Input */}
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.25, duration: 0.3 }}
+              >
+                <Label htmlFor="password" className="text-sm font-semibold text-gray-700 mb-2 block">Password</Label>
+                <div className="relative group">
+                  <Lock className="absolute left-3.5 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-[var(--brand-primary)] transition-colors" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="pl-10 rounded-lg border-2 border-gray-200 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--brand-primary)_20%,white)] transition-all duration-200 placeholder-gray-400"
+                  />
+                </div>
+              </motion.div>
 
+              {/* Error Message */}
               {error && (
-                <div className="text-sm text-red-600 font-medium">{error}</div>
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                  className="rounded-lg bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 px-4 py-3 flex items-start gap-3"
+                  role="alert"
+                >
+                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-red-700 font-semibold">{error}</p>
+                </motion.div>
               )}
 
-              <Button
-                type="submit"
-                className="w-full rounded-lg"
-                disabled={loading}
+              {/* Submit Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 0.3 }}
               >
-                {loading ? "Logging in…" : "Login"}
-              </Button>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-11 rounded-lg font-semibold text-white transition-all duration-200 relative overflow-hidden group"
+                  style={{
+                    background: loading ? "var(--brand-primary)" : "linear-gradient(135deg, var(--brand-secondary), var(--brand-primary))",
+                  }}
+                >
+                  <motion.div
+                    whileHover={!loading ? { scale: 1.05 } : {}}
+                    whileTap={!loading ? { scale: 0.98 } : {}}
+                    className="flex items-center justify-center gap-2 w-full"
+                  >
+                    {loading ? (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        >
+                          <Loader2 className="w-5 h-5" />
+                        </motion.div>
+                        <span>Signing in…</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Sign In</span>
+                        <motion.div
+                          animate={{ x: [0, 4, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                          →
+                        </motion.div>
+                      </>
+                    )}
+                  </motion.div>
+                </Button>
+              </motion.div>
             </form>
 
-            <div className="mt-4 text-center text-sm text-gray-600">
-              Don’t have an account?{" "}
-              <button
-                type="button"
-                onClick={() => navigate("/register")}
-                className="text-indigo-600 hover:underline"
-              >
-                Register
-              </button>
-            </div>
+            <Separator className="my-6 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+
+            {/* Register Link */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.45, duration: 0.3 }}
+              className="text-center"
+            >
+              <p className="text-sm text-gray-600">
+                Don't have an account?{" "}
+                <motion.button
+                  type="button"
+                  onClick={() => navigate("/register")}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[var(--brand-secondary)] to-[var(--brand-primary)] hover:opacity-75 transition-opacity"
+                >
+                  Create one now
+                </motion.button>
+              </p>
+            </motion.div>
           </CardContent>
         </Card>
       </motion.div>
