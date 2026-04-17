@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn, UserPlus } from "lucide-react";
 import { FaFireAlt, FaUserCircle } from "react-icons/fa";
 import { IoFlash } from "react-icons/io5";
 import { useUserProfile } from "@/services/profileServices";
@@ -169,12 +169,31 @@ function Navbar({ onLogout = () => {} }) {
           <div className="flex items-center gap-3 ml-4">
             {!userId ? (
               <>
-                <Button variant="outline" asChild>
-                  <Link to="/login">Login</Link>
-                </Button>
-                <Button asChild>
-                  <Link to="/register">Signup</Link>
-                </Button>
+                <Motion.button
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] font-bold text-sm transition-all duration-300 hover:shadow-md"
+                >
+                  <Link to="/login" className="flex items-center gap-2 no-underline text-[var(--brand-primary)]">
+                    <LogIn size={18} />
+                    <span>Login</span>
+                  </Link>
+                </Motion.button>
+                <Motion.button
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm text-white transition-all duration-300 shadow-lg hover:shadow-2xl relative overflow-hidden group"
+                  style={{
+                    background: "linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%)",
+                  }}
+                >
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 group-hover:translate-x-full transition-transform duration-500" />
+                  <Link to="/register" className="flex items-center gap-2 no-underline text-white relative z-10">
+                    <UserPlus size={18} />
+                    <span>Signup</span>
+                  </Link>
+                </Motion.button>
               </>
             ) : (
               <div className="relative" ref={avatarRef}>
@@ -289,16 +308,31 @@ function Navbar({ onLogout = () => {} }) {
               <div className="pt-2">
                 {!userId ? (
                   <div className="flex gap-3">
-                    <Button variant="outline" asChild className="w-full">
-                      <Link to="/login" onClick={() => setIsOpen(false)}>
-                        Login
+                    <Motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] font-bold text-sm transition-all duration-300 hover:shadow-md"
+                    >
+                      <Link to="/login" onClick={() => setIsOpen(false)} className="flex items-center gap-2 no-underline text-[var(--brand-primary)] w-full justify-center">
+                        <LogIn size={18} />
+                        <span>Login</span>
                       </Link>
-                    </Button>
-                    <Button asChild className="w-full">
-                      <Link to="/register" onClick={() => setIsOpen(false)}>
-                        Signup
+                    </Motion.button>
+                    <Motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold text-sm text-white transition-all duration-300 shadow-lg hover:shadow-2xl relative overflow-hidden group"
+                      style={{
+                        background: "linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%)",
+                      }}
+                    >
+                      {/* Shine effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 group-hover:translate-x-full transition-transform duration-500" />
+                      <Link to="/register" onClick={() => setIsOpen(false)} className="flex items-center gap-2 no-underline text-white relative z-10 w-full justify-center">
+                        <UserPlus size={18} />
+                        <span>Signup</span>
                       </Link>
-                    </Button>
+                    </Motion.button>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">

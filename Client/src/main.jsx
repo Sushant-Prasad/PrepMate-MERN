@@ -28,6 +28,7 @@ import AdminAptitude from "./pages/Admin/AdminAptitude";
 
 
 import { ChatProvider } from "./context/ChatContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 
 
@@ -59,17 +60,17 @@ function Root() {
               <Route index element={<Home />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Reg />} />
-              <Route path="dsa" element={<DSA />} />
-              <Route path="dsa/submit/:id" element={<DSASubmit />} />
-              <Route path="aptitude" element={<Aptitude />} />
-              <Route path="company" element={<CompanyPrep />} />
-              <Route path="rooms" element={<Chat />} />
-              <Route path="aptitude-streak" element={<AptiStreak />} />
-              <Route path="dsa-streak" element={<DSAStreak />} />
-              <Route path="profile" element={<Profile />} />
+              <Route path="dsa" element={<ProtectedRoute element={<DSA />} />} />
+              <Route path="dsa/submit/:id" element={<ProtectedRoute element={<DSASubmit />} />} />
+              <Route path="aptitude" element={<ProtectedRoute element={<Aptitude />} />} />
+              <Route path="company" element={<ProtectedRoute element={<CompanyPrep />} />} />
+              <Route path="rooms" element={<ProtectedRoute element={<Chat />} />} />
+              <Route path="aptitude-streak" element={<ProtectedRoute element={<AptiStreak />} />} />
+              <Route path="dsa-streak" element={<ProtectedRoute element={<DSAStreak />} />} />
+              <Route path="profile" element={<ProtectedRoute element={<Profile />} />} />
             </Route>
 
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/admin" element={<ProtectedRoute element={<AdminLayout />} />}>
               <Route index element={<AdminDashboard />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
