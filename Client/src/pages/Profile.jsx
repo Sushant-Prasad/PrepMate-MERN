@@ -48,21 +48,23 @@ function DefaultAvatar({ size = 72 }) {
 }
 
 function StatCard({ icon: Icon, label, value, color = "blue" }) {
-  const colorClasses = {
-    blue: "border-blue-200 bg-blue-50 text-blue-700",
-    green: "border-green-200 bg-green-50 text-green-700",
-    orange: "border-orange-200 bg-orange-50 text-orange-700",
-    purple: "border-purple-200 bg-purple-50 text-purple-700",
-    red: "border-red-200 bg-red-50 text-red-700",
+  const colorConfig = {
+    blue: { bg: "bg-blue-50", border: "border-blue-200", icon: "text-blue-600", value: "text-blue-900", label: "text-blue-700" },
+    green: { bg: "bg-cyan-50", border: "border-cyan-200", icon: "text-cyan-600", value: "text-cyan-900", label: "text-cyan-700" },
+    orange: { bg: "bg-slate-50", border: "border-slate-200", icon: "text-slate-600", value: "text-slate-900", label: "text-slate-700" },
+    purple: { bg: "bg-indigo-50", border: "border-indigo-200", icon: "text-indigo-600", value: "text-indigo-900", label: "text-indigo-700" },
+    red: { bg: "bg-gray-50", border: "border-gray-200", icon: "text-gray-600", value: "text-gray-900", label: "text-gray-700" },
   };
 
+  const config = colorConfig[color];
+
   return (
-    <div
-      className={`border-2 rounded-xl p-4 flex flex-col items-center text-center ${colorClasses[color]}`}
-    >
-      <Icon className="w-6 h-6 mb-2 opacity-80" />
-      <div className="text-2xl font-bold mb-1">{value}</div>
-      <div className="text-sm font-medium opacity-90">{label}</div>
+    <div className={`relative rounded-2xl p-6 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border-2 ${config.bg} ${config.border}`}>
+      <div className="relative z-10 flex flex-col items-center text-center">
+        <Icon className={`w-8 h-8 ${config.icon} mb-3`} />
+        <div className={`text-4xl font-black mb-2 ${config.value}`}>{value}</div>
+        <div className={`text-sm font-semibold ${config.label}`}>{label}</div>
+      </div>
     </div>
   );
 }
@@ -319,17 +321,17 @@ export default function Profile() {
   const recent = Array.isArray(enrichedRecent) ? enrichedRecent : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="max-w-6xl mx-auto p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#03c6f7c9] via-[#F5FCFF] to-[#7859dd]">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10">
         {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-32" />
-          <div className="relative px-6 md:px-8 pb-6">
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden mb-8 border border-white/50">
+          <div className="bg-gradient-to-r from-[var(--brand-secondary)] via-[var(--brand-primary)] to-[#6EDBF0] h-40 sm:h-48" />
+          <div className="relative px-6 sm:px-8 md:px-10 pb-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 sm:gap-8 -mt-24">
               <div className="relative">
                 <div className="relative group">
                   {/* Avatar */}
-                  <div className="w-32 h-32 border-4 border-white rounded-2xl overflow-hidden bg-white shadow-lg">
+                  <div className="w-40 h-40 sm:w-48 sm:h-48 border-4 border-white rounded-3xl overflow-hidden bg-white shadow-2xl">
                     {profileImage ? (
                       <img
                         src={profileImage}
@@ -337,15 +339,15 @@ export default function Profile() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <DefaultAvatar size={120} />
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
+                        <DefaultAvatar size={140} />
                       </div>
                     )}
                   </div>
 
                   {/* Upload Icon */}
-                  <label className="absolute bottom-1 right-1 bg-blue-600 p-2 rounded-full text-white cursor-pointer shadow-md opacity-0 group-hover:opacity-100 transition">
-                    <Camera size={16} />
+                  <label className="absolute bottom-3 right-3 bg-gradient-to-r from-[var(--brand-secondary)] to-[var(--brand-primary)] p-3 rounded-full text-white cursor-pointer shadow-lg hover:shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <Camera size={20} />
                     <input
                       type="file"
                       accept="image/*"
@@ -358,19 +360,19 @@ export default function Profile() {
                   {profileImage && (
                     <button
                       onClick={handleDeletePhoto}
-                      className="absolute top-1 right-1 bg-red-500 p-2 rounded-full text-white shadow-md opacity-0 group-hover:opacity-100 transition"
+                      className="absolute top-3 right-3 bg-red-500 p-3 rounded-full text-white shadow-lg hover:shadow-2xl hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-all duration-300"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={20} />
                     </button>
                   )}
                 </div>
               </div>
 
-              <div className="text-center md:text-left flex-1 mt-4 md:mt-0">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              <div className="text-center sm:text-left flex-1">
+                <h1 className="text-4xl sm:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[var(--brand-secondary)] to-[var(--brand-primary)] mb-2">
                   {name}
                 </h1>
-                {/* header joined-rooms line intentionally removed — joined rooms moved below progress */}
+                <p className="text-gray-600 font-medium text-lg">Welcome to your profile</p>
               </div>
             </div>
           </div>
@@ -405,13 +407,15 @@ export default function Profile() {
                     color="purple"
                   />
                   <div className="col-span-2 md:col-span-1">
-                    <div className="border-2 border-gray-200 bg-gray-50 text-gray-700 rounded-xl p-4 flex flex-col items-center text-center h-full">
-                      <Calendar className="w-6 h-6 mb-2 opacity-80" />
-                      <div className="text-lg font-bold mb-1">
-                        {lastDSADate}
-                      </div>
-                      <div className="text-sm font-medium opacity-90">
-                        Last Solved
+                    <div className="relative rounded-2xl p-6 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-blue-50 border-2 border-blue-200 flex flex-col items-center text-center h-full justify-center">
+                      <div className="relative z-10">
+                        <Calendar className="w-8 h-8 text-blue-600 mb-3 mx-auto" />
+                        <div className="text-2xl font-black text-blue-900 mb-2">
+                          {lastDSADate}
+                        </div>
+                        <div className="text-sm font-semibold text-blue-700">
+                          Last Solved
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -438,13 +442,15 @@ export default function Profile() {
                     color="orange"
                   />
                   <div className="col-span-2 md:col-span-1">
-                    <div className="border-2 border-gray-200 bg-gray-50 text-gray-700 rounded-xl p-4 flex flex-col items-center text-center h-full">
-                      <Calendar className="w-6 h-6 mb-2 opacity-80" />
-                      <div className="text-lg font-bold mb-1">
-                        {lastAptDate}
-                      </div>
-                      <div className="text-sm font-medium opacity-90">
-                        Last Solved
+                    <div className="relative rounded-2xl p-6 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-indigo-50 border-2 border-indigo-200 flex flex-col items-center text-center h-full justify-center">
+                      <div className="relative z-10">
+                        <Calendar className="w-8 h-8 text-indigo-600 mb-3 mx-auto" />
+                        <div className="text-2xl font-black text-indigo-900 mb-2">
+                          {lastAptDate}
+                        </div>
+                        <div className="text-sm font-semibold text-indigo-700">
+                          Last Solved
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -453,30 +459,30 @@ export default function Profile() {
             </div>
 
             {/* Joined Rooms moved below progress */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <DoorOpen className="w-5 h-5 text-indigo-500" />
+            <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <DoorOpen className="w-6 h-6 text-indigo-500" />
                   Joined Groups
-                </h3>
+                </h2>
                 <a
                   href="/rooms"
-                  className="text-sm text-blue-600 hover:underline"
+                  className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
                 >
                   Manage
                 </a>
               </div>
 
               {Array.isArray(joinedGroups) && joinedGroups.length > 0 ? (
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {joinedGroups.map((group) => (
                     <li
                       key={group._id}
-                      className="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-md p-3"
+                      className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow duration-300"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-4 min-w-0 flex-1">
                         {/* Group Avatar */}
-                        <div className="w-8 h-8 bg-white rounded-md flex items-center justify-center border text-gray-600 overflow-hidden">
+                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-300 text-slate-600 overflow-hidden font-semibold flex-shrink-0">
                           {group.groupImage ? (
                             <img
                               src={group.groupImage}
@@ -489,12 +495,13 @@ export default function Profile() {
                         </div>
 
                         {/* Group Info */}
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium text-gray-900 truncate">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm md:text-base font-semibold text-gray-900 truncate">
                             {group.name}
                           </div>
 
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs md:text-sm text-gray-600 flex items-center gap-1">
+                            <Users className="w-4 h-4" />
                             {group.members} members
                           </div>
                         </div>
@@ -503,10 +510,17 @@ export default function Profile() {
                   ))}
                 </ul>
               ) : (
-                <div className="text-center py-8">
-                  <div className="text-gray-500 mb-3">
-                    You haven't joined any groups yet.
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <DoorOpen className="w-8 h-8 text-gray-400" />
                   </div>
+                  <div className="text-gray-600 font-medium mb-2">You haven't joined any groups yet</div>
+                  <a
+                    href="/rooms"
+                    className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    Explore Study Rooms
+                  </a>
                 </div>
               )}
             </div>
@@ -514,19 +528,19 @@ export default function Profile() {
 
           {/* Right column: Recent Activity */}
           <div>
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-blue-500" />
+            <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <Clock className="w-6 h-6 text-blue-500" />
                 Recent Activity
               </h2>
 
               {recent.length === 0 ? (
-                <div className="text-center py-8">
+                <div className="text-center py-12">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Target className="w-8 h-8 text-gray-400" />
                   </div>
-                  <p className="text-gray-500 text-sm">No recent activity</p>
-                  <p className="text-gray-400 text-xs mt-1">
+                  <p className="text-gray-600 font-medium mb-2">No recent activity</p>
+                  <p className="text-gray-500 text-sm">
                     Start solving questions to see your progress here
                   </p>
                 </div>
