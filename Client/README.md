@@ -1,12 +1,48 @@
-# React + Vite
+# PrepMate Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Basic frontend application for PrepMate, built with React and Vite.
 
-Currently, two official plugins are available:
+## Requirements
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js 18 or higher
+- npm
 
-## Expanding the ESLint configuration
+## Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create a .env file in Client folder:
+
+```env
+VITE_API_URL=http://localhost:3001/api
+```
+
+3. Start development server:
+
+```bash
+npm run dev
+```
+
+## Scripts
+
+- npm run dev: Start local dev server
+- npm run build: Build production files
+- npm run preview: Preview production build
+- npm run lint: Run ESLint checks
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## Notes
+
+- Default frontend URL is usually http://localhost:5173
+- Make sure backend server is running at the API URL above
+
