@@ -6,6 +6,8 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
+const DEFAULT_GROUP_IMAGE = "/default-group.png";
+
 
 // DELETE GROUP (ADMIN ONLY)
 const deleteGroup = asyncHandler(async (req, res) => {
@@ -86,6 +88,90 @@ const editGroup = asyncHandler(async (req, res) => {
 });
 
 
+// UPDATE GROUP IMAGE
+const updateGroupImage = asyncHandler(async (req, res) => {
+  const { groupId } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(groupId)) {
+    throw new ApiError(400, "Invalid group ID");
+  }
+
+  const group = await Conversation.findById(groupId);
+
+  if (!group || !group.isGroup) {
+    throw new ApiError(404, "Group not found");
+  }
+
+  if (group.admin.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Only admin can update group photo");
+  }
+
+  if (!req.file?.path) {
+    throw new ApiError(400, "Image file is required");
+  }
+
+  if (group.groupImagePublicId) {
+    try {
+      await deleteFromCloudinary(group.groupImagePublicId);
+    } catch (err) {
+      console.warn("Cloudinary delete failed:", err.message);
+    }
+  }
+
+  const uploadRes = await uploadOnCloudinary(req.file.path, "image");
+
+  if (!uploadRes || !uploadRes.secure_url) {
+    throw new ApiError(500, "Image upload failed");
+  }
+
+  group.groupImage = uploadRes.secure_url;
+  group.groupImagePublicId = uploadRes.public_id;
+
+  await group.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, "Group photo updated", group)
+  );
+});
+
+
+// DELETE GROUP IMAGE
+const deleteGroupImage = asyncHandler(async (req, res) => {
+  const { groupId } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(groupId)) {
+    throw new ApiError(400, "Invalid group ID");
+  }
+
+  const group = await Conversation.findById(groupId);
+
+  if (!group || !group.isGroup) {
+    throw new ApiError(404, "Group not found");
+  }
+
+  if (group.admin.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Only admin can delete group photo");
+  }
+
+  if (group.groupImagePublicId) {
+    try {
+      await deleteFromCloudinary(group.groupImagePublicId);
+    } catch (err) {
+      console.warn("Cloudinary delete failed:", err.message);
+    }
+  }
+
+  group.groupImage = DEFAULT_GROUP_IMAGE;
+  group.groupImagePublicId = "";
+
+  await group.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, "Group photo deleted", group)
+  );
+});
+
+
 // KICK MEMBER
 const kickMember = asyncHandler(async (req, res) => {
 
@@ -124,5 +210,7 @@ const kickMember = asyncHandler(async (req, res) => {
 export {
   deleteGroup,
   editGroup,
+  updateGroupImage,
+  deleteGroupImage,
   kickMember
 };

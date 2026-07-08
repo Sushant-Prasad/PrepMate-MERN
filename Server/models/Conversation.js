@@ -12,7 +12,7 @@ return this.isGroup;
 
 groupImage: {
 type: String,
-default: "https://cdn-icons-png.flaticon.com/512/456/456212.png"
+default: "/default-group.png"
 },
 
 groupImagePublicId: {

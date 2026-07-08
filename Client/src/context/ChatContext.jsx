@@ -4,6 +4,19 @@ import api from "../utils/api";
 
 export const ChatContext = createContext();
 
+const DEFAULT_GROUP_IMAGE = "/default-group.png";
+
+const normalizeConversation = (conversation) => {
+  if (!conversation) return conversation;
+
+  if (!conversation.isGroup) return conversation;
+
+  return {
+    ...conversation,
+    groupImage: conversation.groupImage || DEFAULT_GROUP_IMAGE,
+  };
+};
+
 export const ChatProvider = ({ children }) => {
 
   // ✅ Cookie auth → user only used for UI / ID reference
@@ -152,7 +165,7 @@ export const ChatProvider = ({ children }) => {
   const fetchGroups = async () => {
     try {
       const res = await api.get("/groups");
-      const groups = res.data.data || [];
+      const groups = (res.data.data || []).map(normalizeConversation);
 
       setConversations((prev) => {
         const existingIds = prev.map((c) => c._id);
@@ -210,7 +223,7 @@ export const ChatProvider = ({ children }) => {
   const fetchConversations = async () => {
     try {
       const res = await api.get("/conversations");
-      setConversations(res.data.data);
+      setConversations((res.data.data || []).map(normalizeConversation));
     } catch (err) {
       console.error("Failed to fetch conversations", err);
     }
@@ -239,7 +252,7 @@ export const ChatProvider = ({ children }) => {
 
   const joinGroup = async (groupId) => {
     const res = await api.post("/join", { groupId });
-    const joinedGroup = res.data.data;
+    const joinedGroup = normalizeConversation(res.data.data);
 
     setConversations((prev) => {
       const exists = prev.some((c) => c._id === joinedGroup._id);
@@ -252,12 +265,14 @@ export const ChatProvider = ({ children }) => {
     });
 
     socketRef.current?.emit("join_conversation", joinedGroup._id);
+    await fetchConversations();
     return joinedGroup;
   };
 
   const leaveGroup = async (groupId) => {
     await api.post("/leave", { groupId });
     setConversations((prev) => prev.filter((c) => c._id !== groupId));
+    await fetchConversations();
   };
 
   const editGroup = async ({ groupId, name, image }) => {
@@ -267,25 +282,63 @@ export const ChatProvider = ({ children }) => {
     if (image) formData.append("groupImage", image);
 
     const res = await api.post("/edit", formData);
-    const updated = res.data.data;
+    const updated = normalizeConversation(res.data.data);
 
     setConversations((prev) =>
       prev.map((c) => (c._id === updated._id ? updated : c))
     );
 
     setActiveConversation(updated);
+    await fetchConversations();
+    return updated;
+  };
+
+  const updateGroupPhoto = async (groupId, image) => {
+    const formData = new FormData();
+    formData.append("groupId", groupId);
+    formData.append("groupImage", image);
+
+    const res = await api.post("/image", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    const updated = normalizeConversation(res.data.data);
+
+    setConversations((prev) =>
+      prev.map((c) => (c._id === updated._id ? updated : c))
+    );
+
+    setActiveConversation(updated);
+    await fetchConversations();
+    return updated;
+  };
+
+  const deleteGroupPhoto = async (groupId) => {
+    const res = await api.delete("/image", {
+      data: { groupId },
+    });
+
+    const updated = normalizeConversation(res.data.data);
+
+    setConversations((prev) =>
+      prev.map((c) => (c._id === updated._id ? updated : c))
+    );
+
+    setActiveConversation(updated);
+    await fetchConversations();
     return updated;
   };
 
   const kickMember = async (groupId, memberId) => {
     const res = await api.post("/kick", { groupId, memberId });
-    const updated = res.data.data;
+    const updated = normalizeConversation(res.data.data);
 
     setConversations((prev) =>
       prev.map((c) => (c._id === updated._id ? updated : c))
     );
 
     setActiveConversation(updated);
+    await fetchConversations();
   };
 
   const deleteGroup = async (groupId) => {
@@ -325,6 +378,8 @@ export const ChatProvider = ({ children }) => {
         joinGroup,
         leaveGroup,
         editGroup,
+        updateGroupPhoto,
+        deleteGroupPhoto,
         kickMember,
         deleteGroup,
         showGroupInfo,

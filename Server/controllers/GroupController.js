@@ -7,6 +7,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import UserProfile from "../models/UserProfile.js";
 
+const DEFAULT_GROUP_IMAGE = "/default-group.png";
+
 
 /* CREATE GROUP */
 export const createGroup = asyncHandler(async (req, res) => {
@@ -42,7 +44,7 @@ export const createGroup = asyncHandler(async (req, res) => {
     userIds.push(req.user._id);
   }
 
-  let groupImage = null;
+  let groupImage = DEFAULT_GROUP_IMAGE;
 
   if (req.file?.path) {
     const upload = await uploadOnCloudinary(req.file.path);
