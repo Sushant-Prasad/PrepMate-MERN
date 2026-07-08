@@ -3,6 +3,7 @@ import { ChatContext } from "../context/ChatContext.jsx";
 // import { AuthContext } from "../context/AuthContext.jsx";
 import MessageBubble from "./MessageBubble.jsx";
 import MessageInput from "./MessageInput.jsx";
+import ConfirmDialog from "./ui/ConfirmDialog.jsx";
 // import api from "../utils/api";
 
 
@@ -23,6 +24,20 @@ export default function ChatWindow() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const [messageQuery, setMessageQuery] = useState("");
+
+  // custom confirm dialog
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({});
+  const confirmResolverRef = useRef(null);
+  function showConfirm(config) {
+    return new Promise((resolve) => {
+      confirmResolverRef.current = resolve;
+      setConfirmConfig(config);
+      setConfirmOpen(true);
+    });
+  }
+  function handleConfirmOk() { setConfirmOpen(false); confirmResolverRef.current?.(true); }
+  function handleConfirmCancel() { setConfirmOpen(false); confirmResolverRef.current?.(false); }
 
   const conversationId = activeConversation?._id;
   const isGroupConversation = Boolean(activeConversation?.isGroup);
@@ -237,16 +252,20 @@ export default function ChatWindow() {
 
 
   const handleLeaveGroup = async () => {
-    if (!window.confirm("Are you sure you want to leave this group?")) return;
+    const ok = await showConfirm({
+      title: "Leave Group",
+      message: "Are you sure you want to leave this group?",
+      confirmText: "Leave",
+      variant: "warning",
+    });
+    if (!ok) return;
 
     try {
       await leaveGroup(activeConversation._id);
-
       setActiveConversation(null);
       setMessages([]);
     } catch (err) {
       console.error(err);
-      alert("Failed to leave group");
     }
   };
 
@@ -409,6 +428,16 @@ export default function ChatWindow() {
           Join the group to start chatting
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        confirmText={confirmConfig.confirmText}
+        variant={confirmConfig.variant}
+        onConfirm={handleConfirmOk}
+        onCancel={handleConfirmCancel}
+      />
     </div>
   );
 }

@@ -52,16 +52,17 @@ export default function AdminDashboard() {
     refetch: refetchApti,
   } = useAptiQuestions();
 
-  // normalize possible shapes
-  const users = usersResp?.data ?? usersResp ?? [];
+  // normalize new response shape: { success, response: { count, totalUsers, totalAdmins, data } }
+  const usersResponse = usersResp?.response ?? usersResp ?? {};
+  const users = usersResponse?.data ?? [];
   const dsaQuestions = dsaResp?.data ?? dsaResp ?? [];
   const aptiQuestions = aptiResp?.data ?? aptiResp ?? [];
 
-  // derived metrics
-  const totalUsers = Array.isArray(users) ? users.length : 0;
-  const totalAdmins = Array.isArray(users) ? users.filter((u) => (u.role || "").toLowerCase() === "admin").length : 0;
-  const totalDSA = Array.isArray(dsaQuestions) ? dsaQuestions.length : 0;
-  const totalApti = Array.isArray(aptiQuestions) ? aptiQuestions.length : 0;
+  // derived metrics — prefer server-computed values, fallback to client-side
+  const totalUsers  = usersResponse?.count       ?? (Array.isArray(users) ? users.length : 0);
+  const totalAdmins = usersResponse?.totalAdmins ?? (Array.isArray(users) ? users.filter((u) => (u.role || "").toLowerCase() === "admin").length : 0);
+  const totalDSA    = Array.isArray(dsaQuestions)  ? dsaQuestions.length  : 0;
+  const totalApti   = Array.isArray(aptiQuestions) ? aptiQuestions.length : 0;
 
   // recent items
   const recentDSA = useMemo(() => {

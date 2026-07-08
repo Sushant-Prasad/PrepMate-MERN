@@ -67,7 +67,7 @@ export const useFetchAllUsers = (params = {}, options = {}) =>
     queryKey: [...AUTH_KEYS.allUsers, params],
     queryFn: () => fetchAllUsersApi(params),
     keepPreviousData: true,
-    staleTime: 60 * 1000,
+    staleTime: 0, // always consider stale so refetch() always hits the network
     ...options,
   });
 

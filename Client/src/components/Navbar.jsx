@@ -2,8 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Menu, X, LogIn, UserPlus } from "lucide-react";
+import { Menu, X, LogIn, UserPlus, ChevronDown, LogOut, User } from "lucide-react";
 import { FaFireAlt, FaUserCircle } from "react-icons/fa";
 import { IoFlash } from "react-icons/io5";
 import { useUserProfile } from "@/services/profileServices";
@@ -12,9 +11,17 @@ import logoSrc from "@/assets/FullLogo.jpg";
 function Navbar({ onLogout = () => {} }) {
   const [isOpen, setIsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [storedUser, setStoredUser] = useState(null);
   const avatarRef = useRef(null);
   const location = useLocation();
+
+  // Track scroll to add shadow
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const readStoredUser = () => {
     try {
@@ -24,6 +31,7 @@ function Navbar({ onLogout = () => {} }) {
       return null;
     }
   };
+
   useEffect(() => {
     setStoredUser(readStoredUser());
   }, [location.pathname]);
@@ -33,7 +41,6 @@ function Navbar({ onLogout = () => {} }) {
     window.addEventListener("storage", syncAuth);
     window.addEventListener("focus", syncAuth);
     window.addEventListener("auth-changed", syncAuth);
-
     return () => {
       window.removeEventListener("storage", syncAuth);
       window.removeEventListener("focus", syncAuth);
@@ -41,55 +48,37 @@ function Navbar({ onLogout = () => {} }) {
     };
   }, []);
 
-  const userId =
-    storedUser?.id ?? storedUser?._id ?? storedUser?.userId ?? null;
+  // Close mobile menu on route change
+  useEffect(() => { setIsOpen(false); }, [location.pathname]);
 
-  // useUserProfile will be disabled when there's no userId
+  const userId = storedUser?.id ?? storedUser?._id ?? storedUser?.userId ?? null;
+
   const { data: profileResp, isLoading: profileLoading } = useUserProfile(
     userId,
     { enabled: !!userId },
   );
-
-  // normalize profile object (your fetcher sometimes returns { success, data })
   const profile = profileResp?.data ?? profileResp ?? null;
 
-  // Safely extract streak numbers (support multiple shapes)
   const safeNumber = (v) => {
     if (v == null) return 0;
     if (typeof v === "number") return v;
-    if (typeof v === "object") {
-      return v.currentStreak ?? v.current ?? v.value ?? 0;
-    }
+    if (typeof v === "object") return v.currentStreak ?? v.current ?? v.value ?? 0;
     const n = Number(v);
     return Number.isFinite(n) ? n : 0;
   };
 
-  // Use profile dsa/aptitude streaks if available; fall back to 0
-  const dsaStreak = safeNumber(
-    profile?.dsaStreak ?? profile?.streaks?.dsa ?? null,
-  );
-  const aptitudeStreak = safeNumber(
-    profile?.aptitudeStreak ?? profile?.streaks?.aptitude ?? null,
-  );
+  const dsaStreak = safeNumber(profile?.dsaStreak ?? profile?.streaks?.dsa ?? null);
+  const aptitudeStreak = safeNumber(profile?.aptitudeStreak ?? profile?.streaks?.aptitude ?? null);
 
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "DSA", href: "/dsa" },
     { name: "Aptitude", href: "/aptitude" },
     { name: "Study Rooms", href: "/rooms" },
-    { name: "CompanyPrep", href: "/company" },
+    { name: "Company Prep", href: "/company" },
   ];
 
-  const navBaseClass =
-    "rounded-lg px-4 py-2.5 text-sm font-bold tracking-wide transition-all duration-300 relative";
-
-  const getNavClass = ({ isActive }) =>
-    `${navBaseClass} ${
-      isActive
-        ? "bg-gradient-to-r from-[var(--brand-primary)] to-[#6EDBF0] text-white shadow-md font-extrabold"
-        : "text-slate-700 hover:text-[var(--brand-secondary)] hover:shadow-sm"
-    }`;
-
+  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e) {
       if (avatarRef.current && !avatarRef.current.contains(e.target)) {
@@ -100,11 +89,22 @@ function Navbar({ onLogout = () => {} }) {
     return () => window.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const displayName = profile?.name ?? storedUser?.name ?? "You";
+  const initials = displayName.charAt(0).toUpperCase();
+
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-        {/* Logo (image) + Text */}
-        <Link
+    <nav
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/60 border-b border-slate-200/80"
+          : "bg-white/80 backdrop-blur-sm border-b border-slate-100"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+
+          {/* ── Logo ── */}
+          <Link
           to="/"
           className="flex items-center gap-3 no-underline"
           aria-label="PrepMate home"
@@ -127,220 +127,254 @@ function Navbar({ onLogout = () => {} }) {
           </div>
         </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-6">
-          <div className="flex items-center gap-2 rounded-xl border border-[color:color-mix(in_srgb,var(--brand-primary)_16%,white)] bg-white/80 p-1">
-            {navLinks.map((link, i) => (
-              <div key={i}>
-                <NavLink to={link.href} end={link.href === "/"} className={getNavClass}>
-                  {link.name}
-                </NavLink>
-              </div>
+          {/* ── Desktop Nav Links ── */}
+          <div className="hidden md:flex items-center gap-1 bg-slate-50/80 border border-slate-200 rounded-2xl px-1.5 py-1.5">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.href}
+                to={link.href}
+                end={link.href === "/"}
+                className={({ isActive }) =>
+                  `relative px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    isActive
+                      ? "bg-gradient-to-r from-[#03045E] to-[#3DBFD9] text-white shadow-md shadow-[#3DBFD9]/30"
+                      : "text-slate-600 hover:text-[#03045E] hover:bg-white hover:shadow-sm"
+                  }`
+                }
+              >
+                {link.name}
+              </NavLink>
             ))}
           </div>
 
-          {/* Streak Icons — only show when logged in */}
-          {userId && (
-            <div className="flex items-center gap-6 ml-3">
-              <Link
-                to="/dsa-streak"
-                className="flex flex-col items-center"
-                title="DSA Streak"
-              >
-                <FaFireAlt className="text-red-500 w-6 h-6" />
-                <span className="text-xs font-semibold text-slate-700">
-                  {profileLoading ? "…" : dsaStreak}
-                </span>
-              </Link>
-              <Link
-                to="/aptitude-streak"
-                className="flex flex-col items-center"
-                title="Aptitude Streak"
-              >
-                <IoFlash className="text-yellow-400 w-6 h-6" />
-                <span className="text-xs font-semibold text-slate-700">
-                  {profileLoading ? "…" : aptitudeStreak}
-                </span>
-              </Link>
-            </div>
-          )}
+          {/* ── Desktop Right Section ── */}
+          <div className="hidden md:flex items-center gap-3">
 
-          {/* Auth / Profile */}
-          <div className="flex items-center gap-3 ml-4">
+            {/* Streak Badges — only when logged in */}
+            {userId && (
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/dsa-streak"
+                  title="DSA Streak"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 rounded-full transition-all duration-200 no-underline group"
+                >
+                  <FaFireAlt className="text-red-500 w-3.5 h-3.5" />
+                  <span className="text-xs font-bold text-red-600">
+                    {profileLoading ? "…" : dsaStreak}
+                  </span>
+                </Link>
+                <Link
+                  to="/aptitude-streak"
+                  title="Aptitude Streak"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-full transition-all duration-200 no-underline group"
+                >
+                  <IoFlash className="text-amber-500 w-3.5 h-3.5" />
+                  <span className="text-xs font-bold text-amber-600">
+                    {profileLoading ? "…" : aptitudeStreak}
+                  </span>
+                </Link>
+              </div>
+            )}
+
+            {/* Auth Buttons / Profile */}
             {!userId ? (
-              <>
-                <Motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] font-bold text-sm transition-all duration-300 hover:shadow-md"
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-[#03045E] border-2 border-[#03045E]/20 hover:border-[#03045E]/60 hover:bg-[#03045E]/5 transition-all duration-200 no-underline"
                 >
-                  <Link to="/login" className="flex items-center gap-2 no-underline text-[var(--brand-primary)]">
-                    <LogIn size={18} />
-                    <span>Login</span>
-                  </Link>
-                </Motion.button>
-                <Motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm text-white transition-all duration-300 shadow-lg hover:shadow-2xl relative overflow-hidden group"
-                  style={{
-                    background: "linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%)",
-                  }}
+                  <LogIn size={15} />
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#03045E] to-[#3DBFD9] hover:from-[#020347] hover:to-[#30b0ca] shadow-md shadow-[#3DBFD9]/30 hover:shadow-lg hover:shadow-[#3DBFD9]/40 transition-all duration-200 no-underline relative overflow-hidden group"
                 >
-                  {/* Shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 group-hover:translate-x-full transition-transform duration-500" />
-                  <Link to="/register" className="flex items-center gap-2 no-underline text-white relative z-10">
-                    <UserPlus size={18} />
-                    <span>Signup</span>
-                  </Link>
-                </Motion.button>
-              </>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+                  <UserPlus size={15} className="relative z-10" />
+                  <span className="relative z-10">Sign Up</span>
+                </Link>
+              </div>
             ) : (
               <div className="relative" ref={avatarRef}>
                 <button
                   onClick={() => setMenuOpen((s) => !s)}
-                  className="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-gray-100 transition"
+                  className="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-xl hover:bg-slate-100 transition-all duration-200 border border-transparent hover:border-slate-200"
                   aria-haspopup="true"
                   aria-expanded={menuOpen}
                 >
+                  {/* Avatar */}
                   {profile?.profileImage ? (
                     <img
                       src={profile.profileImage}
                       alt="profile"
-                      className="w-10 h-10 rounded-full object-cover border"
+                      className="w-8 h-8 rounded-lg object-cover border-2 border-[#3DBFD9]/40"
                     />
                   ) : (
-                    <FaUserCircle className="w-10 h-10 text-slate-600" />
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#03045E] to-[#3DBFD9] flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                      {initials}
+                    </div>
                   )}
-
-                  <div className="hidden sm:block text-left">
-                    <div
-                      className="text-sm font-medium text-slate-800 truncate"
-                      style={{ maxWidth: 140 }}
-                    >
-                      {profile?.name ?? storedUser?.name ?? "You"}
+                  <div className="text-left hidden sm:block">
+                    <div className="text-sm font-semibold text-slate-800 leading-none truncate" style={{ maxWidth: 120 }}>
+                      {displayName}
+                    </div>
+                    <div className="text-xs text-slate-400 mt-0.5">
+                      {storedUser?.role === "admin" ? "Admin" : "Member"}
                     </div>
                   </div>
+                  <ChevronDown
+                    size={14}
+                    className={`text-slate-400 transition-transform duration-200 ${menuOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
 
                 {/* Dropdown */}
                 <AnimatePresence>
                   {menuOpen && (
-                    <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
-                      <Link
-                        to="/profile"
-                        className="block px-4 py-2.5 text-sm font-bold tracking-wide text-slate-700 transition-all duration-200 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        My Profile
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setMenuOpen(false);
-                          setStoredUser(null);
-                          onLogout();
-                        }}
-                        className="w-full text-left px-4 py-2.5 text-sm font-bold tracking-wide text-slate-700 transition-all duration-200 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
-                      >
-                        Sign Out
-                      </button>
-                    </div>
+                    <Motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
+                      className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/60 overflow-hidden z-50"
+                    >
+                      <div className="p-1">
+                        <Link
+                          to="/profile"
+                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#03045E] transition-all duration-150 no-underline"
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          <User size={15} className="text-[#3DBFD9]" />
+                          My Profile
+                        </Link>
+                        <div className="h-px bg-slate-100 mx-2 my-1" />
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            setStoredUser(null);
+                            onLogout();
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-150"
+                        >
+                          <LogOut size={15} />
+                          Sign Out
+                        </button>
+                      </div>
+                    </Motion.div>
                   )}
                 </AnimatePresence>
               </div>
             )}
           </div>
-        </div>
 
-        {/* Mobile Menu Toggle */}
-        <div className="md:hidden">
-          <button onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
-            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          {/* ── Mobile Toggle ── */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-[#03045E] transition-all duration-200"
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Nav */}
+      {/* ── Mobile Nav ── */}
       <AnimatePresence>
         {isOpen && (
           <Motion.div
-            className="md:hidden overflow-hidden bg-white border-t border-gray-200 shadow-lg"
+            className="md:hidden bg-white/98 backdrop-blur-md border-t border-slate-100 shadow-lg"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: "easeInOut" }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
           >
-            <div className="flex flex-col px-6 py-4 space-y-4">
-              {navLinks.map((link, i) => (
+            <div className="px-4 py-4 space-y-1">
+              {navLinks.map((link) => (
                 <NavLink
-                  key={i}
+                  key={link.href}
                   to={link.href}
                   end={link.href === "/"}
-                  className={getNavClass}
+                  className={({ isActive }) =>
+                    `block px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                      isActive
+                        ? "bg-gradient-to-r from-[#03045E] to-[#3DBFD9] text-white shadow-md"
+                        : "text-slate-700 hover:bg-slate-50 hover:text-[#03045E]"
+                    }`
+                  }
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
                 </NavLink>
               ))}
 
-              {/* Streak Icons - Mobile */}
+              {/* Streak Badges - Mobile */}
               {userId && (
-                <div className="flex items-center gap-6 pt-2">
-                  <Link to="/dsa-streak" className="flex flex-col items-center">
-                    <FaFireAlt className="text-red-500 w-6 h-6" />
-                    <span className="text-xs font-semibold text-gray-700">
-                      {profileLoading ? "…" : dsaStreak}
+                <div className="flex items-center gap-3 px-1 pt-2">
+                  <Link
+                    to="/dsa-streak"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl flex-1 justify-center no-underline"
+                  >
+                    <FaFireAlt className="text-red-500 w-4 h-4" />
+                    <span className="text-sm font-bold text-red-600">
+                      {profileLoading ? "…" : dsaStreak} Day Streak
                     </span>
                   </Link>
                   <Link
                     to="/aptitude-streak"
-                    className="flex flex-col items-center"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl flex-1 justify-center no-underline"
                   >
-                    <IoFlash className="text-yellow-400 w-6 h-6" />
-                    <span className="text-xs font-semibold text-gray-700">
-                      {profileLoading ? "…" : aptitudeStreak}
+                    <IoFlash className="text-amber-500 w-4 h-4" />
+                    <span className="text-sm font-bold text-amber-600">
+                      {profileLoading ? "…" : aptitudeStreak} Day Streak
                     </span>
                   </Link>
                 </div>
               )}
 
-              {/* Auth / Profile - Mobile */}
-              <div className="pt-2">
+              {/* Auth - Mobile */}
+              <div className="pt-2 border-t border-slate-100 mt-2">
                 {!userId ? (
-                  <div className="flex gap-3">
-                    <Motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] font-bold text-sm transition-all duration-300 hover:shadow-md"
+                  <div className="flex gap-2">
+                    <Link
+                      to="/login"
+                      onClick={() => setIsOpen(false)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-[#03045E] border-2 border-[#03045E]/20 hover:border-[#03045E]/50 no-underline transition-all"
                     >
-                      <Link to="/login" onClick={() => setIsOpen(false)} className="flex items-center gap-2 no-underline text-[var(--brand-primary)] w-full justify-center">
-                        <LogIn size={18} />
-                        <span>Login</span>
-                      </Link>
-                    </Motion.button>
-                    <Motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold text-sm text-white transition-all duration-300 shadow-lg hover:shadow-2xl relative overflow-hidden group"
-                      style={{
-                        background: "linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%)",
-                      }}
+                      <LogIn size={16} />
+                      Login
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={() => setIsOpen(false)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#03045E] to-[#3DBFD9] no-underline shadow-md transition-all"
                     >
-                      {/* Shine effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 group-hover:translate-x-full transition-transform duration-500" />
-                      <Link to="/register" onClick={() => setIsOpen(false)} className="flex items-center gap-2 no-underline text-white relative z-10 w-full justify-center">
-                        <UserPlus size={18} />
-                        <span>Signup</span>
-                      </Link>
-                    </Motion.button>
+                      <UserPlus size={16} />
+                      Sign Up
+                    </Link>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
+                  <div className="space-y-1">
+                    {/* User Info */}
+                    <div className="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-xl mb-2">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#03045E] to-[#3DBFD9] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                        {initials}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-slate-800">{displayName}</div>
+                        <div className="text-xs text-slate-400">
+                          {storedUser?.role === "admin" ? "Admin" : "Member"}
+                        </div>
+                      </div>
+                    </div>
                     <Link
                       to="/profile"
-                      className="rounded-lg px-4 py-2.5 text-sm font-bold tracking-wide text-slate-700 transition-all duration-200 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
+                      className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 no-underline transition-all"
                       onClick={() => setIsOpen(false)}
                     >
+                      <User size={16} className="text-[#3DBFD9]" />
                       My Profile
                     </Link>
                     <button
@@ -349,8 +383,9 @@ function Navbar({ onLogout = () => {} }) {
                         setStoredUser(null);
                         onLogout();
                       }}
-                      className="w-full rounded-lg px-4 py-2.5 text-left text-sm font-bold tracking-wide text-slate-700 transition-all duration-200 hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_12%,white)] hover:text-[var(--brand-secondary)]"
+                      className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-all"
                     >
+                      <LogOut size={16} />
                       Sign Out
                     </button>
                   </div>

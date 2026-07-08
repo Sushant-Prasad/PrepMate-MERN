@@ -125,8 +125,15 @@ export const logoutUser = async (req, res) => {
 // @route   GET /api/users
 export const getAllUsers = async (req, res) => {
   try {
+    const me = req.user;
     const users = await User.find().select("-password");
-    res.status(200).json({ success: true, count: users.length, data: users });
+    let response = {
+      count: users.length, 
+      totalUsers: users.filter((user) => user.role === "user").length,
+      totalAdmins: users.filter((user) => user.role === "admin").length,
+      data: users
+    }
+    res.status(200).json({ success: true, response });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

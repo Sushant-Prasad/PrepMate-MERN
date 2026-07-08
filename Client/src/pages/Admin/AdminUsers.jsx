@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   useFetchAllUsers,
   useUpdateUser,
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import toast from "react-hot-toast";
 import {
   Users,
@@ -38,26 +39,66 @@ import {
  */
 
 export default function AdminUsers() {
+  // Get the logged-in user's ID from localStorage
+  const loggedInUserId = useMemo(() => {
+    try {
+      const stored = localStorage.getItem("user");
+      if (!stored) return null;
+      const parsed = JSON.parse(stored);
+      return parsed?._id ?? parsed?.id ?? null;
+    } catch {
+      return null;
+    }
+  }, []);
   // fetch users
   const {
     data: listResp,
     isLoading,
+    isFetching,
     isError,
     error,
     refetch,
   } = useFetchAllUsers();
 
-  // normalize different response shapes
+  // normalize new response shape: { success, response: { count, totalUsers, totalAdmins, data } }
+  const responseData = listResp?.response ?? listResp ?? {};
   const users = useMemo(() => {
     if (!listResp) return [];
-    return listResp?.data ?? listResp ?? [];
+    return responseData?.data ?? [];
   }, [listResp]);
+
+  // use server-computed counts when available, fallback to client-side
+  const totalCount   = responseData?.count        ?? users.length;
+  const adminCount   = responseData?.totalAdmins  ?? users.filter((u) => (u.role || "").toLowerCase() === "admin").length;
+  const userCount    = responseData?.totalUsers   ?? (totalCount - adminCount);
 
   // local state
   const [query, setQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // custom confirm dialog state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({});
+  const confirmResolverRef = useRef(null);
+
+  /** Promise-based replacement for window.confirm() */
+  function showConfirm(config) {
+    return new Promise((resolve) => {
+      confirmResolverRef.current = resolve;
+      setConfirmConfig(config);
+      setConfirmOpen(true);
+    });
+  }
+  function handleConfirmOk() {
+    setConfirmOpen(false);
+    confirmResolverRef.current?.(true);
+  }
+  function handleConfirmCancel() {
+    setConfirmOpen(false);
+    confirmResolverRef.current?.(false);
+  }
 
   // mutations
   const updateMutation = useUpdateUser({
@@ -139,7 +180,12 @@ export default function AdminUsers() {
   async function handleDelete(user) {
     const id = user._id ?? user.id;
     if (!id) return toast.error("Missing user id");
-    const ok = window.confirm(`Delete user "${user.name}" (${user.email})? This cannot be undone.`);
+    const ok = await showConfirm({
+      title: "Delete User",
+      message: `Are you sure you want to delete "${user.name}" (${user.email})? This action cannot be undone.`,
+      confirmText: "Delete",
+      variant: "danger",
+    });
     if (!ok) return;
     deleteMutation.mutate(id);
   }
@@ -148,7 +194,12 @@ export default function AdminUsers() {
     const id = user._id ?? user.id;
     if (!id) return toast.error("Missing user id");
     const newRole = (user.role || "user") === "admin" ? "user" : "admin";
-    const ok = window.confirm(`Change role of "${user.name}" to "${newRole}"?`);
+    const ok = await showConfirm({
+      title: "Change Role",
+      message: `Change role of "${user.name}" to "${newRole}"?`,
+      confirmText: "Yes, Change",
+      variant: "warning",
+    });
     if (!ok) return;
     try {
       await updateMutation.mutateAsync({ id, payload: { role: newRole } });
@@ -157,8 +208,7 @@ export default function AdminUsers() {
     }
   }
 
-  const adminCount = users.filter((u) => (u.role || "").toLowerCase() === "admin").length;
-  const userCount = users.length - adminCount;
+
 
   if (isLoading) {
     return (
@@ -219,7 +269,7 @@ export default function AdminUsers() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Users</p>
-                  <p className="text-2xl font-bold text-[#03045E]">{users.length}</p>
+                  <p className="text-2xl font-bold text-[#03045E]">{totalCount}</p>
                 </div>
               </div>
             </CardContent>
@@ -268,10 +318,11 @@ export default function AdminUsers() {
           <Button
             onClick={() => refetch()}
             variant="outline"
+            disabled={isFetching}
             className="border-[#3DBFD9] text-[#03045E] hover:bg-[#3DBFD9]/10 transition-all duration-300"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
+            <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? "animate-spin" : ""}`} />
+            {isFetching ? "Refreshing..." : "Refresh"}
           </Button>
         </div>
 
@@ -305,6 +356,7 @@ export default function AdminUsers() {
             {filtered.map((u) => {
               const id = u._id ?? u.id;
               const isAdmin = (u.role || "").toLowerCase() === "admin";
+              const isSelf = loggedInUserId && id && String(id) === String(loggedInUserId);
               
               return (
                 <Card
@@ -403,11 +455,17 @@ export default function AdminUsers() {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => handleDelete(u)}
-                          className="bg-red-500 hover:bg-red-600 transition-all duration-300 w-full col-span-2"
+                          onClick={() => !isSelf && handleDelete(u)}
+                          disabled={isSelf}
+                          title={isSelf ? "You cannot delete your own account" : "Delete this user"}
+                          className={`transition-all duration-300 w-full col-span-2 ${
+                            isSelf
+                              ? "bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed hover:bg-gray-200 shadow-none"
+                              : "bg-red-500 hover:bg-red-600 text-white"
+                          }`}
                         >
                           <Trash2 className="w-3 h-3 mr-1" />
-                          Delete User
+                          {isSelf ? "Cannot Delete (You)" : "Delete User"}
                         </Button>
                       </div>
                     </div>
@@ -558,6 +616,17 @@ export default function AdminUsers() {
           </div>
         </div>
       )}
+
+      {/* Custom Confirm Dialog */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        confirmText={confirmConfig.confirmText}
+        variant={confirmConfig.variant}
+        onConfirm={handleConfirmOk}
+        onCancel={handleConfirmCancel}
+      />
     </div>
   );
 }

@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import dns from "dns";
+
+// Force Google DNS — local resolver (127.0.0.1) cannot handle MongoDB SRV queries
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 dotenv.config(); // Load .env values
 
 // Create a connection tracker object
@@ -25,6 +30,7 @@ export const connectToDB = async () => {
   } catch (error) {
     // Log connection errors
     console.log("Database connection failed:", error);
+    process.exit(1); // Exit process with failure code
   }
 };
 

@@ -1,5 +1,5 @@
 // src/pages/AdminAptitude.jsx
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   useAptiQuestions,
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import toast from "react-hot-toast";
 import {
   Brain,
@@ -72,6 +73,21 @@ export default function AdminAptitude() {
   const [subCategory, setSubCategory] = useState("");
   const [expectedTime, setExpectedTime] = useState(60);
   const [submitting, setSubmitting] = useState(false);
+
+  // custom confirm dialog state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({});
+  const confirmResolverRef = useRef(null);
+
+  function showConfirm(config) {
+    return new Promise((resolve) => {
+      confirmResolverRef.current = resolve;
+      setConfirmConfig(config);
+      setConfirmOpen(true);
+    });
+  }
+  function handleConfirmOk() { setConfirmOpen(false); confirmResolverRef.current?.(true); }
+  function handleConfirmCancel() { setConfirmOpen(false); confirmResolverRef.current?.(false); }
 
   // mutations
   const createMut = useCreateAptiQuestion({
@@ -229,10 +245,16 @@ export default function AdminAptitude() {
     }
   };
 
-  const handleDelete = (item) => {
+  const handleDelete = async (item) => {
     const id = item._id ?? item.id;
     if (!id) return toast.error("Missing id");
-    if (!window.confirm(`Delete question: "${item.statement?.slice(0, 80) ?? ""}" ?`)) return;
+    const ok = await showConfirm({
+      title: "Delete Question",
+      message: `Are you sure you want to delete this question? This action cannot be undone.`,
+      confirmText: "Delete",
+      variant: "danger",
+    });
+    if (!ok) return;
     deleteMut.mutate(id);
   };
 
@@ -676,6 +698,16 @@ export default function AdminAptitude() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        confirmText={confirmConfig.confirmText}
+        variant={confirmConfig.variant}
+        onConfirm={handleConfirmOk}
+        onCancel={handleConfirmCancel}
+      />
     </div>
   );
 }

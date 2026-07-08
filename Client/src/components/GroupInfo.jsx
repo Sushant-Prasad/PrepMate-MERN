@@ -1,5 +1,7 @@
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { ChatContext } from "../context/ChatContext";
+import ConfirmDialog from "./ui/ConfirmDialog.jsx";
+import toast from "react-hot-toast";
 // import { AuthContext } from "../context/AuthContext";
 
 export default function GroupInfo() {
@@ -18,6 +20,20 @@ export default function GroupInfo() {
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    // custom confirm dialog
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmConfig, setConfirmConfig] = useState({});
+    const confirmResolverRef = useRef(null);
+    function showConfirm(config) {
+      return new Promise((resolve) => {
+        confirmResolverRef.current = resolve;
+        setConfirmConfig(config);
+        setConfirmOpen(true);
+      });
+    }
+    function handleConfirmOk() { setConfirmOpen(false); confirmResolverRef.current?.(true); }
+    function handleConfirmCancel() { setConfirmOpen(false); confirmResolverRef.current?.(false); }
+
     const isAdmin =
   activeConversation.admin?._id?.toString() === user?._id?.toString();
 
@@ -29,15 +45,21 @@ export default function GroupInfo() {
                 name,
                 image
             });
-            alert("Group updated");
+            toast.success("Group updated successfully!");
         } catch {
-            alert("Failed to update group");
+            toast.error("Failed to update group");
         }
         setLoading(false);
     };
 
     const handleDelete = async () => {
-        if (!window.confirm("Delete this group permanently?")) return;
+        const ok = await showConfirm({
+          title: "Delete Group",
+          message: "Are you sure you want to permanently delete this group? This cannot be undone.",
+          confirmText: "Delete",
+          variant: "danger",
+        });
+        if (!ok) return;
         await deleteGroup(activeConversation._id);
         setShowGroupInfo(false);
     };
@@ -135,6 +157,16 @@ export default function GroupInfo() {
                 </button>
             )}
             </div>
+
+            <ConfirmDialog
+              open={confirmOpen}
+              title={confirmConfig.title}
+              message={confirmConfig.message}
+              confirmText={confirmConfig.confirmText}
+              variant={confirmConfig.variant}
+              onConfirm={handleConfirmOk}
+              onCancel={handleConfirmCancel}
+            />
         </div>
     );
 }
