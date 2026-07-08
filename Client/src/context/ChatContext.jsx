@@ -329,6 +329,19 @@ export const ChatProvider = ({ children }) => {
     return updated;
   };
 
+  const addMember = async (groupId, memberId) => {
+    const res = await api.post("/add", { groupId, memberId });
+    const updated = normalizeConversation(res.data.data);
+
+    setConversations((prev) =>
+      prev.map((c) => (c._id === updated._id ? updated : c))
+    );
+
+    setActiveConversation(updated);
+    await fetchConversations();
+    return updated;
+  };
+
   const kickMember = async (groupId, memberId) => {
     const res = await api.post("/kick", { groupId, memberId });
     const updated = normalizeConversation(res.data.data);
@@ -380,6 +393,7 @@ export const ChatProvider = ({ children }) => {
         editGroup,
         updateGroupPhoto,
         deleteGroupPhoto,
+        addMember,
         kickMember,
         deleteGroup,
         showGroupInfo,

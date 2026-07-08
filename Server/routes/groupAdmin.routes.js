@@ -1,6 +1,7 @@
 // routes/groupAdmin.routes.js 
 import { Router } from "express";
 import {
+	addMember,
 	deleteGroup,
 	deleteGroupImage,
 	editGroup,
@@ -17,6 +18,7 @@ router.post("/delete", protect, deleteGroup);
 router.post("/edit", protect, upload.single("groupImage"), editGroup);
 router.post("/image", protect, upload.single("groupImage"), updateGroupImage);
 router.delete("/image", protect, deleteGroupImage);
+router.post("/add", protect, addMember);
 router.post("/kick", protect, kickMember);
 
 // conversation control

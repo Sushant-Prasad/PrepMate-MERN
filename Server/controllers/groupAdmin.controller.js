@@ -1,12 +1,19 @@
 import mongoose from "mongoose";
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
+import User from "../models/User.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const DEFAULT_GROUP_IMAGE = "/default-group.png";
+
+const populateGroup = (group) =>
+  group.populate([
+    { path: "participants", select: "name email avatar" },
+    { path: "admin", select: "name email avatar" },
+  ]);
 
 
 // DELETE GROUP (ADMIN ONLY)
@@ -81,6 +88,7 @@ const editGroup = asyncHandler(async (req, res) => {
   }
 
   await group.save();
+  await populateGroup(group);
 
   return res.status(200).json(
     new ApiResponse(200, "Group updated", group)
@@ -128,6 +136,7 @@ const updateGroupImage = asyncHandler(async (req, res) => {
   group.groupImagePublicId = uploadRes.public_id;
 
   await group.save();
+  await populateGroup(group);
 
   return res.status(200).json(
     new ApiResponse(200, "Group photo updated", group)
@@ -165,9 +174,57 @@ const deleteGroupImage = asyncHandler(async (req, res) => {
   group.groupImagePublicId = "";
 
   await group.save();
+  await populateGroup(group);
 
   return res.status(200).json(
     new ApiResponse(200, "Group photo deleted", group)
+  );
+});
+
+// ADD MEMBER
+const addMember = asyncHandler(async (req, res) => {
+
+  const { groupId, memberId } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(groupId)) {
+    throw new ApiError(400, "Invalid group ID");
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(memberId)) {
+    throw new ApiError(400, "Invalid member ID");
+  }
+
+  const group = await Conversation.findById(groupId);
+
+  if (!group || !group.isGroup) {
+    throw new ApiError(404, "Group not found");
+  }
+
+  if (group.admin.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Only admin can add members");
+  }
+
+  const user = await User.findById(memberId).select("_id");
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const alreadyMember = group.participants.some(
+    id => id.toString() === memberId.toString()
+  );
+
+  if (alreadyMember) {
+    throw new ApiError(400, "User is already a group member");
+  }
+
+  group.participants.push(user._id);
+
+  await group.save();
+  await populateGroup(group);
+
+  return res.status(200).json(
+    new ApiResponse(200, "Member added", group)
   );
 });
 
@@ -200,6 +257,7 @@ const kickMember = asyncHandler(async (req, res) => {
   );
 
   await group.save();
+  await populateGroup(group);
 
   return res.status(200).json(
     new ApiResponse(200, "Member removed", group)
@@ -208,6 +266,7 @@ const kickMember = asyncHandler(async (req, res) => {
 
 
 export {
+  addMember,
   deleteGroup,
   editGroup,
   updateGroupImage,

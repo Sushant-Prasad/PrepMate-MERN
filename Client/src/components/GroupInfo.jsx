@@ -1,8 +1,9 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { ChatContext } from "../context/ChatContext";
 import ConfirmDialog from "./ui/ConfirmDialog.jsx";
+import UserSearch from "./UserSearch";
 import toast from "react-hot-toast";
-import { Camera, Trash2 } from "lucide-react";
+import { Camera, Trash2, UserPlus } from "lucide-react";
 
 const getId = (value) => value?._id?.toString?.() || value?.toString?.() || "";
 
@@ -13,6 +14,7 @@ export default function GroupInfo() {
     editGroup,
     updateGroupPhoto,
     deleteGroupPhoto,
+    addMember,
     kickMember,
     deleteGroup,
     setShowGroupInfo,
@@ -21,6 +23,7 @@ export default function GroupInfo() {
   const [name, setName] = useState(activeConversation?.name || "");
   const [saving, setSaving] = useState(false);
   const [photoLoading, setPhotoLoading] = useState(false);
+  const [addingMember, setAddingMember] = useState(false);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({});
@@ -126,8 +129,31 @@ export default function GroupInfo() {
     setShowGroupInfo(false);
   };
 
+  const handleAddMember = async (member) => {
+    if (!member?._id || addingMember) return;
+
+    const isAlreadyMember = (activeConversation.participants || []).some(
+      (participant) => getId(participant) === member._id.toString()
+    );
+
+    if (isAlreadyMember) {
+      toast.error("User is already in this group");
+      return;
+    }
+
+    setAddingMember(true);
+    try {
+      await addMember(activeConversation._id, member._id);
+      toast.success(`${member.name || "User"} added to group`);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to add member");
+    } finally {
+      setAddingMember(false);
+    }
+  };
+
   const uniqueParticipants = Array.from(
-    new Map((activeConversation.participants || []).map((p) => [p._id, p])).values()
+    new Map((activeConversation.participants || []).map((p) => [getId(p), p])).values()
   );
 
   const currentImage = activeConversation.groupImage || "/default-group.png";
@@ -220,15 +246,31 @@ export default function GroupInfo() {
           </section>
         </div>
 
-        <h3 className="mb-2 font-semibold text-[var(--brand-secondary)]">Participants</h3>
+        <div className="mt-6 mb-2 flex items-center justify-between gap-3">
+          <h3 className="font-semibold text-[var(--brand-secondary)]">Participants</h3>
+          {isAdmin && addingMember && (
+            <span className="text-xs font-medium text-muted-foreground">Adding...</span>
+          )}
+        </div>
+
+        {isAdmin && (
+          <div className="mb-4 rounded-lg border border-border bg-background p-3">
+            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--brand-secondary)]">
+              <UserPlus className="h-4 w-4" />
+              Add Member
+            </div>
+            <UserSearch mode="modal" onSelect={handleAddMember} />
+          </div>
+        )}
+
         <div className="space-y-2">
           {uniqueParticipants.map((p) => (
             <div
-              key={p._id}
+              key={getId(p)}
               className="flex items-center justify-between rounded-lg border border-border bg-background p-3"
             >
               <div className="min-w-0">
-                <p className="truncate font-medium text-foreground">{p.name}</p>
+                <p className="truncate font-medium text-foreground">{p.name || p.email || "Group member"}</p>
 
                 {getId(p) === adminId && (
                   <span className="text-xs text-[var(--brand-secondary)]">Admin</span>
@@ -237,7 +279,7 @@ export default function GroupInfo() {
 
               {isAdmin && getId(p) !== userId && (
                 <button
-                  onClick={() => kickMember(activeConversation._id, p._id)}
+                  onClick={() => kickMember(activeConversation._id, getId(p))}
                   className="rounded-md px-2 py-1 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
                 >
                   Kick
