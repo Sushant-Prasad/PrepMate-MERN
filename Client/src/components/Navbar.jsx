@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Menu, X, LogIn, UserPlus, ChevronDown, LogOut, User } from "lucide-react";
+import { Menu, X, LogIn, UserPlus, ChevronDown, LogOut, User, Settings } from "lucide-react";
 import { FaFireAlt, FaUserCircle } from "react-icons/fa";
 import { IoFlash } from "react-icons/io5";
 import { useUserProfile } from "@/services/profileServices";
@@ -13,6 +13,7 @@ function Navbar({ onLogout = () => {} }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [storedUser, setStoredUser] = useState(null);
+  const isAdmin = storedUser?.role?.toLowerCase?.() === "admin";
   const avatarRef = useRef(null);
   const location = useLocation();
 
@@ -248,7 +249,19 @@ function Navbar({ onLogout = () => {} }) {
                           <User size={15} className="text-[#3DBFD9]" />
                           My Profile
                         </Link>
-                        <div className="h-px bg-slate-100 mx-2 my-1" />
+                        {isAdmin && (
+                          <>
+                            <Link
+                              to="/admin"
+                              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#03045E] transition-all duration-150 no-underline"
+                              onClick={() => setMenuOpen(false)}
+                            >
+                              <Settings size={15} className="text-[#3DBFD9]" />
+                              Admin Panel
+                            </Link>
+                            <div className="h-px bg-slate-100 mx-2 my-1" />
+                          </>
+                        )}
                         <button
                           onClick={() => {
                             setMenuOpen(false);
@@ -377,6 +390,16 @@ function Navbar({ onLogout = () => {} }) {
                       <User size={16} className="text-[#3DBFD9]" />
                       My Profile
                     </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 no-underline transition-all"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Settings size={16} className="text-[#3DBFD9]" />
+                        Admin Panel
+                      </Link>
+                    )}
                     <button
                       onClick={() => {
                         setIsOpen(false);

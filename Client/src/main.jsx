@@ -1,5 +1,5 @@
 // src/main.jsx
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -34,7 +34,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
-function Root() {
+export function Root() {
   const handleLogout = async () => {
     try {
       await axios.post(
@@ -46,7 +46,7 @@ function Root() {
       console.warn("Logout request failed", err);
     } finally {
       localStorage.removeItem("user"); // optional
-      navigate("/login", { replace: true });
+      window.location.replace("/login");
     }
   };
 

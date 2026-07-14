@@ -201,7 +201,7 @@ function Home() {
         
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes blob {
           0%,
           100% {

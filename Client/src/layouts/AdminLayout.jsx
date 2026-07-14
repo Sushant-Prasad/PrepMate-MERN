@@ -13,6 +13,7 @@ import {
   Settings,
   Bell,
   ChevronRight,
+  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoSrc from "@/assets/FullLogo.jpg";
@@ -243,6 +244,14 @@ export default function AdminLayout() {
 
             {/* Right side actions */}
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/")}
+                className="hidden sm:inline-flex items-center gap-2 rounded-xl border-[#3DBFD9]/30 text-[#03045E] hover:bg-[#3DBFD9]/10 hover:text-[#03045E]"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                User Panel
+              </Button>
               {/* User avatar on mobile */}
               <div className="md:hidden">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3DBFD9] to-[#0096c7] text-white font-bold text-sm flex items-center justify-center shadow-md">
