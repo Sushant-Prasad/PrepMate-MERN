@@ -263,7 +263,7 @@ export default function AdminDashboard() {
               
               <div className="flex flex-wrap gap-3">
                 <Button 
-                  onClick={() => navigate("/admin/dsa")}
+                  onClick={() => navigate("/admin/dsa-questions")}
                   className="bg-[#3DBFD9] hover:bg-[#34aac3] text-white border-none shadow-lg shadow-[#3DBFD9]/30 transition-all duration-300 hover:scale-105"
                 >
                   <Code2 className="w-4 h-4 mr-2" />
